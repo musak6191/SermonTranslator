@@ -3,11 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
 
-interface SermonTranslatorProps {
-  initialData: { status: string }
-}
-
-export default function SermonTranslator({ initialData }: SermonTranslatorProps) {
+export default function SermonTranslator() {
   const [transcript, setTranscript] = useState('')
   const [german, setGerman] = useState('')
   const [english, setEnglish] = useState('')
@@ -119,6 +115,12 @@ export default function SermonTranslator({ initialData }: SermonTranslatorProps)
             <div className="bg-gray-50 p-4 rounded min-h-32 whitespace-pre-wrap">{english}</div>
           </div>
         </div>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-6 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Back to Main Menu
+        </button>
       </div>
     </div>
   )
