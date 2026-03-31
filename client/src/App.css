@@ -1,0 +1,55 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.translator {
+  margin-top: 2rem;
+}
+
+.input-section {
+  margin-bottom: 2rem;
+}
+
+.text-input {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.text-input textarea {
+  width: 80%;
+  max-width: 600px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.text-input button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.text-display {
+  margin-top: 2rem;
+  text-align: left;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.text-display h2 {
+  color: #333;
+}
+
+.text-display p {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 5px;
+  min-height: 2rem;
+  white-space: pre-wrap;
+}
