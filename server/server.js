@@ -13,8 +13,9 @@ const io = socketIo(server, {
   }
 });
 
-app.use(cors());
-app.use(express.json());
+app.get('/status', (req, res) => {
+  res.json({ status: 'running' });
+});
 
 async function translateText(text, targetLang) {
   try {
