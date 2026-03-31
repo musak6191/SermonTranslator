@@ -52,6 +52,6 @@ A real-time sermon translation application that converts spoken Turkish into Ger
 
 This application uses the browser's Web Speech API, which requires microphone access and is supported in modern browsers like Chrome and Edge.
 
-# Braucht eure App SSR/Next.js – oder wäre Vite eigentlich besser geeignet? Begründet anhand von SEO und Interaktivität.
+## Braucht eure App SSR/Next.js – oder wäre Vite eigentlich besser geeignet? Begründet anhand von SEO und Interaktivität.
 
-Klar CSR, da Websockets für meine Anwendung wichtig sind und diese besser mit CSR funktionieren.
+Klar CSR, da Websockets für meine Anwendung wichtig sind und diese besser mit CSR funktionieren. Die SEO ist hierbei zweitrangig, da es sich ohnehin bereits um ein nischiges Produkt handelt.
