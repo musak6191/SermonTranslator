@@ -64,3 +64,12 @@ This application uses the browser's Web Speech API, which requires microphone ac
 ## Braucht eure App SSR/Next.js – oder wäre Vite eigentlich besser geeignet? Begründet anhand von SEO und Interaktivität.
 
 Klar CSR, da Websockets für meine Anwendung wichtig sind und diese besser mit CSR funktionieren. Die SEO ist hierbei zweitrangig, da es sich ohnehin bereits um ein nischiges Produkt handelt.
+
+## Welche Ressourcen hat die App?
+
+/TranslationEnglish, /TranslationGerman, /InputTurkish, /Imam, /Listener, /sessions
+
+Hierarchie: /InputTurkish can only be accessed from the /Imam, who is also the only one who can start a /session
+            /Translations can only be viewed by the /Listener, who can participate in a session
+
+Strukturentscheidung: "Flaches Design mit Query-Parametern", da meine App wenige Daten handelt, sondern der meiste Traffic in Echtzeit passiert.
