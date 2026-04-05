@@ -48,6 +48,7 @@ jspm_packages/
 .yarn-integrity
 
 # dotenv environment variables file
+mcp.config.json
 .env
 
 # IDEs and editors

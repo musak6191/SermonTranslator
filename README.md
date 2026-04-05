@@ -27,19 +27,28 @@ A real-time sermon translation application that converts spoken Turkish into Ger
    npm install
    ```
 
-2. Start the backend server:
+2. **Configure MCP (Model Context Protocol) for design system integration:**
    ```bash
-   cd server
-   npm run dev
+   # Copy the example configuration
+   cp mcp.config.example.json mcp.config.json
+
+   # Edit mcp.config.json and replace YOUR_STITCH_API_KEY_HERE with your actual API key
+   # Get your API key from: https://console.cloud.google.com/apis/credentials
    ```
 
-3. Start the frontend development server:
+3. Start the backend server:
+   ```bash
+   cd server
+   npm start
+   ```
+
+4. Start the frontend development server:
    ```bash
    cd client
    npm run dev
    ```
 
-4. Open http://localhost:5173 in your browser.
+5. Open http://localhost:5173 in your browser.
 
 ## Usage
 
