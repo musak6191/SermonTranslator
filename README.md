@@ -148,7 +148,35 @@ Deletes a translation from the system.
 curl -X DELETE http://localhost:3001/api/translations/1
 ```
 
-## Usage
+## Testing the API
+
+### Using Postman/HoppScotch
+
+A complete Postman collection is provided for easy API testing:
+
+1. **Download the collection:**
+   - File: `server/translations-api.postman_collection.json`
+
+2. **Import in Postman:**
+   - Open Postman → Click "Import" → Select the JSON file
+   - All endpoints, request bodies, and test scripts will be pre-configured
+
+3. **Import in HoppScotch:**
+   - Visit https://hoppscotch.io
+   - Click "Import" → "Paste Raw Text" → Copy-paste the JSON collection content
+   - All requests are ready to use
+
+4. **Run requests:**
+   - Make sure the API server is running (`node translations-api.js`)
+   - The base URL is pre-configured as `http://localhost:3001`
+   - Click any request and send to test the endpoint
+
+The collection includes:
+- ✅ All 5 endpoints with example requests
+- ✅ Pre-configured headers and request bodies
+- ✅ Multiple response examples (success and error cases)
+- ✅ Automated tests for status codes and response validation
+- ✅ Environment variable for the base URL
 
 1. Click "Start Listening" to begin speech recognition.
 2. Speak in Turkish.

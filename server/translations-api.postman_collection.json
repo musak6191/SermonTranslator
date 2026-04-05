@@ -1,0 +1,476 @@
+{
+  "info": {
+    "_postman_id": "sermon-translator-api",
+    "name": "Sermon Translator - Translation API",
+    "description": "REST API for managing sermon translations with full CRUD operations",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Translations",
+      "description": "All translation endpoints",
+      "item": [
+        {
+          "name": "Get All Translations",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response is an array', function() {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/translations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "translations"
+              ]
+            },
+            "description": "Retrieve all translations from the system"
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3001/api/translations",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "translations"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [],
+              "body": "[{\"id\":1,\"originalText\":\"Assalamu alaikum\",\"translatedText\":\"Peace be upon you\",\"language\":\"en\",\"createdAt\":\"2026-04-01T00:00:00.000Z\"},{\"id\":2,\"originalText\":\"Bismillah\",\"translatedText\":\"In the name of God\",\"language\":\"en\",\"createdAt\":\"2026-04-02T00:00:00.000Z\"}]"
+            }
+          ]
+        },
+        {
+          "name": "Get Translation by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has required fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json).to.have.property('originalText');",
+                  "    pm.expect(json).to.have.property('translatedText');",
+                  "    pm.expect(json).to.have.property('language');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/translations/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "translations",
+                "1"
+              ]
+            },
+            "description": "Retrieve a specific translation by ID. Change the ID in the URL to the desired translation ID."
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3001/api/translations/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "translations",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [],
+              "body": "{\"id\":1,\"originalText\":\"Assalamu alaikum\",\"translatedText\":\"Peace be upon you\",\"language\":\"en\",\"createdAt\":\"2026-04-01T00:00:00.000Z\"}"
+            },
+            {
+              "name": "Not Found - 404",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3001/api/translations/999",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "translations",
+                    "999"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [],
+              "body": "{\"error\":\"Translation not found\",\"id\":999}"
+            }
+          ]
+        },
+        {
+          "name": "Create Translation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response contains created translation', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('message').to.equal('Translation created successfully');",
+                  "    pm.expect(json.translation).to.have.property('id');",
+                  "    pm.expect(json.translation).to.have.property('originalText');",
+                  "    pm.expect(json.translation).to.have.property('translatedText');",
+                  "    pm.expect(json.translation).to.have.property('language');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"originalText\":\"Subhanallah\",\"translatedText\":\"Glory be to God\",\"language\":\"en\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/translations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "translations"
+              ]
+            },
+            "description": "Create a new translation with required fields: originalText, translatedText, and language"
+          },
+          "response": [
+            {
+              "name": "Success - 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"originalText\":\"Subhanallah\",\"translatedText\":\"Glory be to God\",\"language\":\"en\"}"
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/translations",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "translations"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [],
+              "body": "{\"message\":\"Translation created successfully\",\"translation\":{\"id\":3,\"originalText\":\"Subhanallah\",\"translatedText\":\"Glory be to God\",\"language\":\"en\",\"createdAt\":\"2026-04-05T12:11:37.344Z\"}}"
+            },
+            {
+              "name": "Bad Request - 400 (Missing Field)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"originalText\":\"Alhamdulillah\"}"
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/translations",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "translations"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [],
+              "body": "{\"error\":\"Missing required fields\",\"missingFields\":[\"translatedText\",\"language\"]}"
+            }
+          ]
+        },
+        {
+          "name": "Update Translation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response contains updated translation', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('message').to.equal('Translation updated successfully');",
+                  "    pm.expect(json.translation).to.have.property('updatedAt');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"originalText\":\"Masha'Allah\",\"translatedText\":\"What Allah has willed\",\"language\":\"en\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/translations/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "translations",
+                "1"
+              ]
+            },
+            "description": "Completely replace an existing translation. All required fields must be provided: originalText, translatedText, and language"
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"originalText\":\"Masha'Allah\",\"translatedText\":\"What Allah has willed\",\"language\":\"en\"}"
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/translations/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "translations",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [],
+              "body": "{\"message\":\"Translation updated successfully\",\"translation\":{\"id\":1,\"originalText\":\"Masha'Allah\",\"translatedText\":\"What Allah has willed\",\"language\":\"en\",\"createdAt\":\"2026-04-01T00:00:00.000Z\",\"updatedAt\":\"2026-04-05T12:11:43.788Z\"}}"
+            },
+            {
+              "name": "Not Found - 404",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"originalText\":\"Alhamdulillah\",\"translatedText\":\"All praise is due to Allah\",\"language\":\"en\"}"
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/translations/999",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "translations",
+                    "999"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [],
+              "body": "{\"error\":\"Translation not found\",\"id\":999}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Translation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204 No Content', function() {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/translations/3",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "translations",
+                "3"
+              ]
+            },
+            "description": "Delete a translation by ID. Returns 204 No Content on success."
+          },
+          "response": [
+            {
+              "name": "Success - 204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3001/api/translations/3",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "translations",
+                    "3"
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [],
+              "body": ""
+            },
+            {
+              "name": "Not Found - 404",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3001/api/translations/999",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "translations",
+                    "999"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [],
+              "body": "{\"error\":\"Translation not found\",\"id\":999}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001",
+      "type": "string"
+    }
+  ]
+}
