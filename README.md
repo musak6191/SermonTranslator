@@ -11,10 +11,12 @@ A real-time sermon translation application that converts spoken Turkish into Ger
 
 ## Tech Stack
 
-- **Frontend**: React + Vite (Port 5173)
+- **Frontend**: Next.js with App Router (Port 5173)
 - **Backend**: Express.js with Socket.IO (Port 3000)
-- **Translation**: LibreTranslate API
+- **Translation API**: Express.js REST API (Port 3001)
+- **Translation Service**: LibreTranslate API
 - **Speech Recognition**: Web Speech API
+- **Design System**: Stitch with Material Design 3
 
 ## Setup
 
@@ -36,19 +38,115 @@ A real-time sermon translation application that converts spoken Turkish into Ger
    # Get your API key from: https://console.cloud.google.com/apis/credentials
    ```
 
-3. Start the backend server:
+3. Start the backend server (Socket.IO for real-time translations):
    ```bash
    cd server
    npm start
    ```
 
-4. Start the frontend development server:
+4. **(Optional) Start the Translation API server** (REST API for managing translations):
+   ```bash
+   cd server
+   node translations-api.js
+   ```
+   The API will be available at `http://localhost:3001/api/translations`
+
+5. Start the frontend development server:
    ```bash
    cd client
    npm run dev
    ```
 
-5. Open http://localhost:5173 in your browser.
+6. Open http://localhost:5173 in your browser.
+
+## API Endpoints
+
+### Translation API (Port 3001)
+
+The Translation API provides CRUD operations for managing translations. All endpoints are prefixed with `/api/translations`.
+
+#### GET /api/translations
+
+Returns all translations stored in the system.
+
+**Response:**
+- Status: `200 OK`
+- Body: Array of translation objects
+
+```bash
+curl http://localhost:3001/api/translations
+```
+
+#### GET /api/translations/:id
+
+Returns a specific translation by ID.
+
+**Response:**
+- Status: `200 OK` - Translation found
+- Status: `404 Not Found` - Translation does not exist
+
+```bash
+curl http://localhost:3001/api/translations/1
+```
+
+#### POST /api/translations
+
+Creates a new translation. All fields are required.
+
+**Required Fields:**
+- `originalText` (string): The original text to translate
+- `translatedText` (string): The translated text
+- `language` (string): Target language code (e.g., "en", "de")
+
+**Response:**
+- Status: `201 Created` - Translation successfully created
+- Status: `400 Bad Request` - Missing required fields
+
+```bash
+curl -X POST http://localhost:3001/api/translations \
+  -H "Content-Type: application/json" \
+  -d '{
+    "originalText": "Assalamu alaikum",
+    "translatedText": "Peace be upon you",
+    "language": "en"
+  }'
+```
+
+#### PUT /api/translations/:id
+
+Completely replaces an existing translation. All fields are required.
+
+**Required Fields:**
+- `originalText` (string): Updated original text
+- `translatedText` (string): Updated translated text
+- `language` (string): Updated language code
+
+**Response:**
+- Status: `200 OK` - Translation successfully updated
+- Status: `404 Not Found` - Translation does not exist
+- Status: `400 Bad Request` - Missing required fields
+
+```bash
+curl -X PUT http://localhost:3001/api/translations/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "originalText": "Wa alaikum assalam",
+    "translatedText": "And upon you be peace",
+    "language": "en"
+  }'
+```
+
+#### DELETE /api/translations/:id
+
+Deletes a translation from the system.
+
+**Response:**
+- Status: `204 No Content` - Translation successfully deleted
+- Status: `404 Not Found` - Translation does not exist
+
+```bash
+curl -X DELETE http://localhost:3001/api/translations/1
+```
 
 ## Usage
 
