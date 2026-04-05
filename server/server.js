@@ -13,8 +13,11 @@ const io = socketIo(server, {
   }
 });
 
+let connectedClients = 0;
+let sessionActive = false;
+
 app.get('/status', (req, res) => {
-  res.json({ status: 'running' });
+  res.json({ status: 'running', clients: connectedClients, sessionActive });
 });
 
 async function translateText(text, targetLang) {
@@ -33,17 +36,40 @@ async function translateText(text, targetLang) {
 }
 
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  connectedClients++;
+  console.log(`A user connected. Total clients: ${connectedClients}`);
+
+  // Send current status to new client
+  socket.emit('listenerCount', connectedClients);
+  socket.emit('sessionStatus', { active: sessionActive });
 
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    connectedClients--;
+    console.log(`User disconnected. Total clients: ${connectedClients}`);
+    io.emit('listenerCount', connectedClients);
   });
 
   // Handle speech input and translation
   socket.on('speech', async (data) => {
-    const german = await translateText(data.text, 'de');
-    const english = await translateText(data.text, 'en');
-    socket.emit('translation', { original: data.text, german, english });
+    if (sessionActive) {
+      const german = await translateText(data.text, 'de');
+      const english = await translateText(data.text, 'en');
+      io.emit('translation', { original: data.text, german, english });
+    }
+  });
+
+  // Handle session management
+  socket.on('startSession', () => {
+    sessionActive = true;
+    io.emit('sessionStatus', { active: true });
+    console.log('Session started');
+  });
+
+  socket.on('endSession', () => {
+    sessionActive = false;
+    io.emit('sessionStatus', { active: false });
+    io.emit('sessionEnded');
+    console.log('Session ended');
   });
 });
 

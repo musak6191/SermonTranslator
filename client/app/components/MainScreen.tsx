@@ -1,45 +1,25 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import SermonTranslator from './SermonTranslator'
-import ListenerView from './ListenerView'
+import { useRouter } from 'next/navigation'
 
 export default function MainScreen() {
-  const [mode, setMode] = useState<'imam' | 'listener' | null>(null)
-
-  useEffect(() => {
-    console.log('Mode changed to:', mode)
-  }, [mode])
-
-  if (mode === 'imam') {
-    return <SermonTranslator />
-  }
-
-  if (mode === 'listener') {
-    return <ListenerView />
-  }
+  const router = useRouter()
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-        <h1 className="text-3xl font-bold mb-8">Sermon Translator</h1>
-        <p className="mb-4">Current mode: {mode || 'main'}</p>
-        <div className="space-y-4">
+    <div className="min-h-screen bg-surface flex items-center justify-start p-16">
+      <div className="max-w-md w-full ml-20">
+        <h1 className="text-4xl font-serif mb-16 text-primary">Sermon Translator</h1>
+        <p className="mb-8 text-on-surface-variant">Choose your role to begin</p>
+        <div className="space-y-6">
           <button
-            onClick={() => {
-              console.log('Clicked imam');
-              setMode('imam');
-            }}
-            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg"
+            onClick={() => router.push('/imam')}
+            className="w-full bg-primary hover:bg-primary-container text-on-primary font-sans py-4 px-8 rounded-xl text-xl shadow-sm transition-colors"
           >
             Translate as an Imam
           </button>
           <button
-            onClick={() => {
-              console.log('Clicked listener');
-              setMode('listener');
-            }}
-            className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg"
+            onClick={() => router.push('/listener')}
+            className="w-full bg-secondary hover:bg-secondary-container text-on-secondary font-sans py-4 px-8 rounded-xl text-xl shadow-sm transition-colors"
           >
             Participate as a Listener
           </button>
