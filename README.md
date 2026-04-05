@@ -178,6 +178,66 @@ The collection includes:
 - ✅ Automated tests for status codes and response validation
 - ✅ Environment variable for the base URL
 
+### Troubleshooting "400 Bad Request" Errors
+
+If you receive `400 Bad Request` errors when testing POST or PUT endpoints, follow these steps:
+
+#### For HoppScotch:
+
+1. **Verify Content-Type Header:**
+   - Click the request → "Headers" tab
+   - Ensure `Content-Type: application/json` is set
+   - If missing, add it manually: Key: `Content-Type`, Value: `application/json`
+
+2. **Check Request Body:**
+   - Click the request → "Body" tab
+   - Select "JSON" as the body type (not Text)
+   - Ensure the JSON is valid with all required fields:
+     ```json
+     {
+       "originalText": "Your Turkish text",
+       "translatedText": "Your translation",
+       "language": "en"
+     }
+     ```
+
+3. **Validate JSON Format:**
+   - Use an online JSON validator to ensure the JSON is properly formatted
+   - Check for missing quotes, brackets, or commas
+
+4. **API Error Details:**
+   - Check the response body for detailed error messages
+   - The API now provides helpful error messages indicating which fields are missing or invalid
+
+#### For Postman:
+
+1. **Import the Pre-configured Collection:**
+   - Use the provided `translations-api.postman_collection.json` which has all headers and bodies pre-configured
+   - This avoids manual configuration errors
+
+2. **Use "Send" Button:**
+   - After importing, just click "Send" on any request
+   - No additional configuration needed
+
+#### Common Issues:
+
+| Issue | Solution |
+|-------|----------|
+| "Request body is empty" | Ensure Body tab has JSON content with all required fields |
+| "Missing required fields" | Check that `originalText`, `translatedText`, and `language` are all present |
+| "Invalid field types" | Ensure all fields are strings, not numbers or booleans |
+| Content-Type error | Manually set header `Content-Type: application/json` |
+
+#### Server Logging:
+
+If issues persist, check the server logs by running the API:
+```bash
+cd server
+node translations-api.js
+```
+
+The server will log all incoming requests, showing exactly what was received. This helps identify if the Content-Type header or request body isn't being sent correctly.
+
 1. Click "Start Listening" to begin speech recognition.
 2. Speak in Turkish.
 3. The original text and translations will appear in real-time.
