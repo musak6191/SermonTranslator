@@ -94,18 +94,20 @@ curl http://localhost:3001/api/translations/1
 Creates a new translation. All fields are required.
 
 **Required Fields:**
+- `sessionId` (number): ID of the session this translation belongs to
 - `originalText` (string): The original text to translate
 - `translatedText` (string): The translated text
 - `language` (string): Target language code (e.g., "en", "de")
 
 **Response:**
 - Status: `201 Created` - Translation successfully created
-- Status: `400 Bad Request` - Missing required fields
+- Status: `400 Bad Request` - Missing required fields or invalid sessionId
 
 ```bash
 curl -X POST http://localhost:3001/api/translations \
   -H "Content-Type: application/json" \
   -d '{
+    "sessionId": 1,
     "originalText": "Assalamu alaikum",
     "translatedText": "Peace be upon you",
     "language": "en"
@@ -117,6 +119,7 @@ curl -X POST http://localhost:3001/api/translations \
 Completely replaces an existing translation. All fields are required.
 
 **Required Fields:**
+- `sessionId` (number): ID of the session this translation belongs to
 - `originalText` (string): Updated original text
 - `translatedText` (string): Updated translated text
 - `language` (string): Updated language code
@@ -124,7 +127,7 @@ Completely replaces an existing translation. All fields are required.
 **Response:**
 - Status: `200 OK` - Translation successfully updated
 - Status: `404 Not Found` - Translation does not exist
-- Status: `400 Bad Request` - Missing required fields
+- Status: `400 Bad Request` - Missing required fields or invalid sessionId
 
 ```bash
 curl -X PUT http://localhost:3001/api/translations/1 \
@@ -147,6 +150,96 @@ Deletes a translation from the system.
 ```bash
 curl -X DELETE http://localhost:3001/api/translations/1
 ```
+
+## Data Schema
+
+### User Object
+
+Represents users in the system with different roles for accessing features.
+
+**Fields:**
+- `id` (number): Unique identifier for the user (auto-generated)
+- `name` (string): Full real name of the user
+- `role` (string): User role - either "imam" or "listener"
+- `createdAt` (string): ISO 8601 timestamp of when the user was created
+
+**Example:**
+```json
+{
+  "id": 1,
+  "name": "Ahmed Hassan",
+  "role": "imam",
+  "createdAt": "2026-04-01T00:00:00.000Z"
+}
+```
+
+**Roles:**
+- `imam`: Can input Turkish text and start sessions
+- `listener`: Can view translations and participate in sessions
+
+**Validation Rules:**
+- `name` must be non-empty and represent a real person's name
+- `role` must be either "imam" or "listener"
+
+### Session Object
+
+Represents translation sessions started by imams and joined by listeners.
+
+**Fields:**
+- `id` (number): Unique identifier for the session (auto-generated)
+- `imamId` (number): ID of the imam who started the session
+- `title` (string): Descriptive title for the session
+- `isActive` (boolean): Whether the session is currently active
+- `createdAt` (string): ISO 8601 timestamp of when the session was created
+- `participants` (array): List of listener user IDs participating in the session
+
+**Example:**
+```json
+{
+  "id": 1,
+  "imamId": 1,
+  "title": "Friday Sermon Translation",
+  "isActive": true,
+  "createdAt": "2026-04-01T10:00:00.000Z",
+  "participants": [2, 3, 4]
+}
+```
+
+**Validation Rules:**
+- `imamId` must reference an existing user with role "imam"
+- `participants` array should contain valid listener user IDs
+- Only imams can create and manage sessions
+
+### Translation Object
+
+The core data structure for storing sermon translations.
+
+**Fields:**
+- `id` (number): Unique identifier for the translation (auto-generated)
+- `sessionId` (number): ID of the session this translation belongs to
+- `originalText` (string): The original Turkish text being translated
+- `translatedText` (string): The translated text in the target language
+- `language` (string): Target language code (e.g., "en" for English, "de" for German)
+- `createdAt` (string): ISO 8601 timestamp of when the translation was created
+
+**Example:**
+```json
+{
+  "id": 1,
+  "sessionId": 1,
+  "originalText": "Assalamu alaikum",
+  "translatedText": "Peace be upon you",
+  "language": "en",
+  "createdAt": "2026-04-01T10:05:00.000Z"
+}
+```
+
+**Validation Rules:**
+- All fields except `id` and `createdAt` are required for POST/PUT operations
+- `sessionId` must reference an existing session
+- `originalText`, `translatedText`, and `language` must be non-empty strings
+- `language` should be a valid language code (currently supports "en" and "de")
+- `sessionId` must reference an existing active session
 
 ## Testing the API
 
@@ -177,66 +270,6 @@ The collection includes:
 - ✅ Multiple response examples (success and error cases)
 - ✅ Automated tests for status codes and response validation
 - ✅ Environment variable for the base URL
-
-### Troubleshooting "400 Bad Request" Errors
-
-If you receive `400 Bad Request` errors when testing POST or PUT endpoints, follow these steps:
-
-#### For HoppScotch:
-
-1. **Verify Content-Type Header:**
-   - Click the request → "Headers" tab
-   - Ensure `Content-Type: application/json` is set
-   - If missing, add it manually: Key: `Content-Type`, Value: `application/json`
-
-2. **Check Request Body:**
-   - Click the request → "Body" tab
-   - Select "JSON" as the body type (not Text)
-   - Ensure the JSON is valid with all required fields:
-     ```json
-     {
-       "originalText": "Your Turkish text",
-       "translatedText": "Your translation",
-       "language": "en"
-     }
-     ```
-
-3. **Validate JSON Format:**
-   - Use an online JSON validator to ensure the JSON is properly formatted
-   - Check for missing quotes, brackets, or commas
-
-4. **API Error Details:**
-   - Check the response body for detailed error messages
-   - The API now provides helpful error messages indicating which fields are missing or invalid
-
-#### For Postman:
-
-1. **Import the Pre-configured Collection:**
-   - Use the provided `translations-api.postman_collection.json` which has all headers and bodies pre-configured
-   - This avoids manual configuration errors
-
-2. **Use "Send" Button:**
-   - After importing, just click "Send" on any request
-   - No additional configuration needed
-
-#### Common Issues:
-
-| Issue | Solution |
-|-------|----------|
-| "Request body is empty" | Ensure Body tab has JSON content with all required fields |
-| "Missing required fields" | Check that `originalText`, `translatedText`, and `language` are all present |
-| "Invalid field types" | Ensure all fields are strings, not numbers or booleans |
-| Content-Type error | Manually set header `Content-Type: application/json` |
-
-#### Server Logging:
-
-If issues persist, check the server logs by running the API:
-```bash
-cd server
-node translations-api.js
-```
-
-The server will log all incoming requests, showing exactly what was received. This helps identify if the Content-Type header or request body isn't being sent correctly.
 
 1. Click "Start Listening" to begin speech recognition.
 2. Speak in Turkish.
