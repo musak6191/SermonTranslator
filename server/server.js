@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const http = require('http');
+const path = require('path');
 const socketIo = require('socket.io');
 const cors = require('cors');
 const axios = require('axios');
@@ -43,6 +44,15 @@ app.use(cors({
   credentials: true
 }));
 app.use(cookieParser());
+
+// ============================================================================
+// STATIC FILES (Next.js export)
+// ============================================================================
+const CLIENT_BUILD_PATH = process.env.CLIENT_BUILD_PATH || path.join(__dirname, '../client/out');
+
+// Serve the statically compiled Next.js app. The `extensions` option lets
+// routes like /listener resolve to /listener.html from the export.
+app.use(express.static(CLIENT_BUILD_PATH, { extensions: ['html'] }));
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -246,11 +256,19 @@ Available endpoints:
 
 // Error handling for undefined routes (placed after all routes)
 app.use((req, res) => {
-  res.status(404).json({
-    error: 'Route not found',
-    path: req.path,
-    method: req.method
-  });
+  // API/socket routes that fall through are genuine 404s.
+  if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
+    return res.status(404).json({
+      error: 'Route not found',
+      path: req.path,
+      method: req.method
+    });
+  }
+
+  // The Next.js export is a multi-page site, so valid routes are already
+  // resolved by express.static above (e.g. /stored/view -> stored/view.html).
+  // Anything reaching here is a real not-found, so serve the exported 404 page.
+  res.status(404).sendFile(path.join(CLIENT_BUILD_PATH, '404.html'));
 });
 
 // Graceful shutdown

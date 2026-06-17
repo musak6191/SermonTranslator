@@ -101,7 +101,7 @@ export default function StoredSermonsPage() {
               return (
                 <div
                   key={session.id}
-                  onClick={() => router.push(`/stored/${session.id}`)}
+                  onClick={() => router.push(`/stored/view?id=${session.id}`)}
                   className="flex items-center justify-between px-8 py-6 cursor-pointer rounded-xl transition-colors duration-150 bg-[#eef7ec] hover:bg-[#dbeade]"
                 >
                   <div>

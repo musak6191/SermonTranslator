@@ -112,7 +112,7 @@ export default function DiscussPage() {
               return (
                 <div
                   key={forum.id}
-                  onClick={() => router.push(`/discuss/${forum.id}`)}
+                  onClick={() => router.push(`/discuss/view?id=${forum.id}`)}
                   className="flex items-start justify-between px-8 py-6 cursor-pointer rounded-xl transition-colors duration-150 bg-[#eef7ec] hover:bg-[#dbeade]"
                 >
                   <div>
