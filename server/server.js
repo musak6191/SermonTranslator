@@ -245,6 +245,7 @@ app.use('/_next/static', express.static(path.join(CLIENT_BUILD_PATH, '_next/stat
 // and explicitly prevent HTML files from being cached so updates are instantly loaded.
 app.use(express.static(CLIENT_BUILD_PATH, {
   redirect: false,
+  extensions: ['html'],
   setHeaders: (res, filePath) => {
     if (filePath.endsWith('.html')) {
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
