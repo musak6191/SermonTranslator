@@ -51,8 +51,15 @@ app.use(cookieParser());
 // ============================================================================
 const CLIENT_BUILD_PATH = process.env.CLIENT_BUILD_PATH || path.join(__dirname, '../client/out');
 
-// Serve the statically compiled Next.js app. The `extensions` option lets
-// routes like /listener resolve to /listener.html from the export.
+// Serve the statically compiled Next.js app.
+// Rewrite trailing slashes internally so routes like /login/ match /login.html
+app.use((req, res, next) => {
+  if (req.path.length > 1 && req.path.endsWith('/') && !req.path.startsWith('/api')) {
+    req.url = req.url.replace(/\/(\?|$)/, '$1');
+  }
+  next();
+});
+
 app.use(express.static(CLIENT_BUILD_PATH, { extensions: ['html'] }));
 
 // ============================================================================
