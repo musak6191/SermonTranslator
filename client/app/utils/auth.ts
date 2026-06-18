@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.VITE_API_BASE_URL || 'http://localhost:3001'
+const API_BASE_URL = typeof process.env.VITE_API_BASE_URL === 'string' ? process.env.VITE_API_BASE_URL : 'http://localhost:3001'
 
 export const apiBaseUrl = API_BASE_URL
 
