@@ -17,6 +17,7 @@ const forumsRouter = require('./modules/forums/forums.routes');
 const pushRouter = require('./modules/push/push.routes');
 
 const app = express();
+app.set('trust proxy', 1);
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {

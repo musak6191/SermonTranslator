@@ -130,7 +130,11 @@ authRouter.post('/logout', async (req, res) => {
 
   try {
     const result = await logoutUser(requestData, userId);
-    res.clearCookie('token');
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
     res.status(200).json(result);
   } catch (error) {
     console.error('Logout error:', error);
