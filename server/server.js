@@ -46,21 +46,7 @@ app.use(cors({
 }));
 app.use(cookieParser());
 
-// ============================================================================
-// STATIC FILES (Next.js export)
-// ============================================================================
-const CLIENT_BUILD_PATH = process.env.CLIENT_BUILD_PATH || path.join(__dirname, '../client/out');
 
-// Serve the statically compiled Next.js app.
-// Rewrite trailing slashes internally so routes like /login/ match /login.html
-app.use((req, res, next) => {
-  if (req.path.length > 1 && req.path.endsWith('/') && !req.path.startsWith('/api')) {
-    req.url = req.url.replace(/\/(\?|$)/, '$1');
-  }
-  next();
-});
-
-app.use(express.static(CLIENT_BUILD_PATH, { extensions: ['html'] }));
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -220,8 +206,9 @@ io.on('connection', (socket) => {
 });
 
 // ============================================================================
-// STATUS ENDPOINT
+// API ROUTES
 // ============================================================================
+// Register API routes first so they are processed before static file/SPA fallbacks
 app.get('/status', (req, res) => {
   res.json({ status: 'running', clients: connectedClients, sessionActive });
 });
@@ -232,6 +219,55 @@ app.use('/api/sessions', createSessionRouter(io));
 app.use('/api/translations', translationsRouter);
 app.use('/api/forums', forumsRouter);
 app.use('/api/push', pushRouter);
+
+// JSON-404 handler for all unmatched API routes
+app.use('/api', (req, res) => {
+  res.status(404).json({
+    error: 'API route not found',
+    path: req.originalUrl,
+    method: req.method
+  });
+});
+
+// ============================================================================
+// STATIC FILES & SPA FALLBACK
+// ============================================================================
+const CLIENT_BUILD_PATH = process.env.CLIENT_BUILD_PATH || path.join(__dirname, '../client/out');
+
+// 1. Serve hashed static assets (inside _next/static) with 1-year max-age and immutable flag.
+// These filenames contain unique hashes of the content, so they never change.
+app.use('/_next/static', express.static(path.join(CLIENT_BUILD_PATH, '_next/static'), {
+  maxAge: '1y',
+  immutable: true
+}));
+
+// 2. Serve other static files (images, favicon, etc.) with short cache max-age,
+// and explicitly prevent HTML files from being cached so updates are instantly loaded.
+app.use(express.static(CLIENT_BUILD_PATH, {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    } else {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+    }
+  }
+}));
+
+// 3. SPA Fallback: Serve index.html for all other page requests so React client-side router handles them.
+// Explicitly prevent index.html from being cached.
+app.get('/*', (req, res, next) => {
+  // If a request for API or Socket.io fell through to here, do not return index.html
+  if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
+    return next();
+  }
+
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.sendFile(path.join(CLIENT_BUILD_PATH, 'index.html'));
+});
 
 // ============================================================================
 // START SERVER
@@ -260,23 +296,6 @@ Available endpoints:
   PUT    /api/translations/:id      - Update translation
   DELETE /api/translations/:id      - Delete translation
   `);
-});
-
-// Error handling for undefined routes (placed after all routes)
-app.use((req, res) => {
-  // API/socket routes that fall through are genuine 404s.
-  if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
-    return res.status(404).json({
-      error: 'Route not found',
-      path: req.path,
-      method: req.method
-    });
-  }
-
-  // The Next.js export is a multi-page site, so valid routes are already
-  // resolved by express.static above (e.g. /stored/view -> stored/view.html).
-  // Anything reaching here is a real not-found, so serve the exported 404 page.
-  res.status(404).sendFile(path.join(CLIENT_BUILD_PATH, '404.html'));
 });
 
 // Graceful shutdown
