@@ -244,6 +244,7 @@ app.use('/_next/static', express.static(path.join(CLIENT_BUILD_PATH, '_next/stat
 // 2. Serve other static files (images, favicon, etc.) with short cache max-age,
 // and explicitly prevent HTML files from being cached so updates are instantly loaded.
 app.use(express.static(CLIENT_BUILD_PATH, {
+  redirect: false,
   setHeaders: (res, filePath) => {
     if (filePath.endsWith('.html')) {
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
