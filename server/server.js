@@ -241,11 +241,37 @@ app.use('/_next/static', express.static(path.join(CLIENT_BUILD_PATH, '_next/stat
   immutable: true
 }));
 
-// 2. Serve other static files (images, favicon, etc.) with short cache max-age,
-// and explicitly prevent HTML files from being cached so updates are instantly loaded.
+// 2. Explicitly serve Next.js exported .html pages BEFORE express.static.
+// Problem: Next.js generates both `out/login.html` AND an `out/login/` subdirectory.
+// express.static finds the directory first and looks for index.html inside it (which
+// doesn't exist), then gives up — causing the SPA fallback to wrongly serve index.html
+// (the root page with auth-redirect logic) for every route like /login, /register, etc.
+// This middleware explicitly resolves the correct .html file, bypassing the collision.
+app.use((req, res, next) => {
+  // Only handle page routes — skip API, socket.io, _next assets, and paths with a file extension
+  if (
+    req.path.startsWith('/api') ||
+    req.path.startsWith('/socket.io') ||
+    req.path.startsWith('/_next') ||
+    req.path.includes('.')
+  ) {
+    return next();
+  }
+
+  const routePath = req.path === '/' ? 'index.html' : `${req.path.replace(/\/+$/, '')}.html`;
+  const filePath = path.join(CLIENT_BUILD_PATH, routePath);
+
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      // .html file not found for this route — fall through to next middleware
+      next();
+    }
+  });
+});
+
+// 3. Serve other static files (images, favicon, sw.js, etc.) with short cache max-age.
 app.use(express.static(CLIENT_BUILD_PATH, {
   redirect: false,
-  extensions: ['html'],
   setHeaders: (res, filePath) => {
     if (filePath.endsWith('.html')) {
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -257,10 +283,8 @@ app.use(express.static(CLIENT_BUILD_PATH, {
   }
 }));
 
-// 3. SPA Fallback: Serve index.html for all other page requests so React client-side router handles them.
-// Explicitly prevent index.html from being cached.
+// 4. SPA Fallback: last resort — serve index.html for any unmatched route.
 app.get('/*', (req, res, next) => {
-  // If a request for API or Socket.io fell through to here, do not return index.html
   if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
     return next();
   }
