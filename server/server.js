@@ -41,7 +41,7 @@ const prisma = new PrismaClient();
 // ============================================================================
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: 'http://zermon.de',
   credentials: true
 }));
 app.use(cookieParser());
@@ -179,7 +179,7 @@ io.on('connection', (socket) => {
     sessionActive = false;
     io.emit('sessionStatus', { active: false });
     io.emit('sessionEnded');
-    
+
     if (data?.sessionId) {
       try {
         const translationsCount = await prisma.translation.count({

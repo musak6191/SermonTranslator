@@ -5,20 +5,7 @@ const nextConfig = {
   env: {
     VITE_API_BASE_URL: apiBaseUrl,
   },
-  output: 'export',
-  async rewrites() {
-    const base = apiBaseUrl.replace(/\/$/, '')
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${base}/api/:path*`,
-      },
-      {
-        source: '/socket.io/:path*',
-        destination: `${base}/socket.io/:path*`,
-      },
-    ]
-  },
+  output: 'export'
 }
 
 module.exports = nextConfig
