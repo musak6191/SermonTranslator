@@ -11,7 +11,9 @@ export default function Page() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await authFetch('/api/auth/me')
+        // Pass handle401=false so authFetch does NOT do a hard window.location redirect
+        // on 401 — we handle the redirect ourselves via router.push below.
+        const response = await authFetch('/api/auth/me', {}, false)
 
         if (response.ok) {
           const data = await response.json()
@@ -25,21 +27,16 @@ export default function Page() {
           router.push('/login')
         }
       } catch (error) {
-        const err = error as { message?: string }
-
-        if (err.message === 'Unauthorized') {
-          router.push('/login')
-        } else {
-          console.error('Auth check failed:', error)
-          router.push('/login')
-        }
+        console.error('Auth check failed:', error)
+        router.push('/login')
       } finally {
         setLoading(false)
       }
     }
 
     checkAuth()
-  }, [router])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (loading) {
     return (
