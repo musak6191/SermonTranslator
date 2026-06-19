@@ -21,7 +21,7 @@ app.set('trust proxy', 1);
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: 'http://zermon.de',
     methods: ['GET', 'POST']
   }
 });
