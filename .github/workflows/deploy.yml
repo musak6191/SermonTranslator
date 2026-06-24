@@ -1,0 +1,74 @@
+name: Deploy single Node.js app to Hetzner
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
+      - name: Copy Frontend Build to Backend Public
+        run: |
+          mkdir -p backend/public
+          cp -r frontend/dist/* backend/public/
+
+      # --- AB HIER FÜR SSH-PASSWORT OPTIMIERT ---
+      
+      # Installiert sshpass auf dem GitHub-Runner, um Passwörter automatisieren zu können
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      # Host-Schlüssel hinzufügen, damit SSH nicht fragt: "Are you sure you want to continue connecting?"
+      - name: Adding Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p 222 -H ${{ secrets.HETZNER_SSH_HOST }} >> ~/.ssh/known_hosts
+
+      # rsync nutzt sshpass, um das Passwort sicher zu übergeben
+      - name: Deploy files via rsync
+        run: |
+          sshpass -p "${{ secrets.HETZNER_SSH_PASSWORD }}" rsync -avz --delete \
+            -e "ssh -p 222" \
+            --exclude='node_modules' \
+            --exclude='.env' \
+            --exclude='.git' \
+            --exclude='.prisma/client' \
+            backend/ ${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SSH_HOST }}:~/meinprojekt.de
+
+      # Der finale SSH-Befehl nutzt ebenfalls sshpass
+      - name: Execute Server Tasks via SSH
+        run: |
+          sshpass -p "${{ secrets.HETZNER_SSH_PASSWORD }}" ssh -p 222 ${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SSH_HOST }} << 'EOF'
+            cd ~/meinprojekt.de
+            
+            echo "Installiere Produktions-Abhängigkeiten auf dem Server..."
+            npm ci --omit=dev
+            
+            echo "Generiere Prisma-Client..."
+            npx prisma generate
+            
+            echo "Führe Datenbank-Migrationen aus (migrate deploy)..."
+            npx prisma migrate deploy
+            
+            echo "Erzeuge Restart-Trigger für die Node.js-App..."
+            touch server.js 2>/dev/null || touch app.js 2>/dev/null
+          EOF
