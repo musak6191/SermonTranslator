@@ -26,10 +26,10 @@ jobs:
           npm ci
           npm run build
 
-      - name: Copy client Build to Backend Public
+      - name: Copy client Build to server Public
         run: |
-          mkdir -p backend/public
-          cp -r client/dist/* backend/public/
+          mkdir -p server/public
+          cp -r client/out/* server/public/
 
       # --- AB HIER FÜR SSH-PASSWORT OPTIMIERT ---
       
@@ -52,7 +52,7 @@ jobs:
             --exclude='.env' \
             --exclude='.git' \
             --exclude='.prisma/client' \
-            backend/ ${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SSH_HOST }}:~/meinprojekt.de
+            server/ ${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SSH_HOST }}:~/meinprojekt.de
 
       # Der finale SSH-Befehl nutzt ebenfalls sshpass
       - name: Execute Server Tasks via SSH
