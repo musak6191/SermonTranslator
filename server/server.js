@@ -51,33 +51,43 @@ app.use(cookieParser());
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
-const TRANSLATE_ENDPOINTS = [
-  process.env.LIBRETRANSLATE_URL || 'https://translate.argosopentech.com/translate',
-  'https://libretranslate.com/translate'
-];
-
 async function translateText(text, targetLang) {
   if (!text) {
     return text;
   }
 
-  const payload = {
-    q: text,
-    source: 'auto',
-    target: targetLang,
-    format: 'text'
-  };
-
-  for (const endpoint of TRANSLATE_ENDPOINTS) {
+  // If LIBRETRANSLATE_URL is set in environment, prioritize it (allowing self-hosting)
+  if (process.env.LIBRETRANSLATE_URL) {
+    const payload = {
+      q: text,
+      source: 'auto',
+      target: targetLang,
+      format: 'text'
+    };
     try {
-      const response = await axios.post(endpoint, payload, { timeout: 10000 });
+      const response = await axios.post(process.env.LIBRETRANSLATE_URL, payload, { timeout: 10000 });
       if (response?.data?.translatedText) {
         return response.data.translatedText;
       }
-      console.error('Translation returned unexpected response from', endpoint, response?.data);
+      console.error('Translation returned unexpected response from custom LibreTranslate:', response?.data);
     } catch (error) {
-      console.error('Translation endpoint failed:', endpoint, error?.response?.status || error?.code || error?.message);
+      console.error('Custom LibreTranslate endpoint failed:', error?.response?.status || error?.code || error?.message);
     }
+  }
+
+  // Default fallback: Google Translate free web API
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const response = await axios.get(url, { timeout: 10000 });
+    if (response?.data && response.data[0]) {
+      const translated = response.data[0].map(segment => segment[0]).join('');
+      if (translated) {
+        return translated;
+      }
+    }
+    console.error('Google Translate free API returned unexpected response:', response?.data);
+  } catch (error) {
+    console.error('Google Translate free API failed:', error?.response?.status || error?.code || error?.message);
   }
 
   console.error('Translation failed for all endpoints; using source text fallback.');
