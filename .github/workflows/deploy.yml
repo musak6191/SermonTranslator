@@ -52,13 +52,13 @@ jobs:
             --exclude='.env' \
             --exclude='.git' \
             --exclude='.prisma/client' \
-            server/ ${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SSH_HOST }}:~/meinprojekt.de
+            server/ ${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SSH_HOST }}:~/server
 
       # Der finale SSH-Befehl nutzt ebenfalls sshpass
       - name: Execute Server Tasks via SSH
         run: |
           sshpass -p "${{ secrets.HETZNER_SSH_PASSWORD }}" ssh -p 222 ${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SSH_HOST }} << 'EOF'
-            cd ~/meinprojekt.de
+            cd ~/server
             
             echo "Installiere Produktions-Abhängigkeiten auf dem Server..."
             npm ci --omit=dev
