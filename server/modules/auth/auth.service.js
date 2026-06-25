@@ -210,11 +210,12 @@ const resetPasswordWithToken = async (data, userId) => {
     throw error;
   }
 
+  const secret = process.env.JWT_SECRET + user.password;
   try {
-    jwt.verify(token, process.env.JWT_SECRET + user.password);
+    jwt.verify(token, secret);
   } catch (err) {
     const error = new Error('Invalid or expired token');
-    error.status = 401;
+    error.status = 400;
     error.payload = {
       error: 'Invalid or expired token'
     };

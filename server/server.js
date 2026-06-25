@@ -100,6 +100,17 @@ async function translateText(text, targetLang) {
 let connectedClients = 0;
 let sessionActive = false;
 
+io.use((socket, next) => {
+  const cookies = require('cookie').parse(socket.handshake.headers.cookie || '');
+  const token = cookies.token;
+  if (!token) return next(new Error('Authentication error'));
+  require('jsonwebtoken').verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return next(new Error('Authentication error'));
+    socket.user = decoded;
+    next();
+  });
+});
+
 io.on('connection', (socket) => {
   connectedClients++;
   console.log(`A user connected. Total clients: ${connectedClients}`);

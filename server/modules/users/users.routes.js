@@ -8,7 +8,8 @@ usersRouter.post('/', authenticate, async (req, res) => {
   const userId = req.user.userId;
 
   try {
-    const newUser = await createUser(req.body, userId);
+    const { name, email, password } = req.body;
+    const newUser = await createUser({ name, email, password }, userId);
     res.status(201).json({
       message: 'User created successfully',
       user: newUser
