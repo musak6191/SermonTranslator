@@ -85,6 +85,16 @@ const getSession = async (data, userId) => {
     throw error;
   }
 
+  // IDOR guard: only the session imam or a registered participant may view details.
+  if (session.imamId !== userId && !session.participants.some(p => p.id === userId)) {
+    const error = new Error('Unauthorized access to session');
+    error.status = 403;
+    error.payload = {
+      error: 'Unauthorized access to session'
+    };
+    throw error;
+  }
+
   return session;
 };
 

@@ -210,3 +210,14 @@ Bestandteil 	Läuft als 	      Hostname (Beispiel) 	      Wird ausgeliefert von
 Frontend (React) 	statisches Build 	zermon.de 	                  Express
 Backend (Express) Node.js-App       zermon.de/api	            konsoleH Node.js
 Datenbank (SQL) 	MySQL/MariaDB 	zermonDB (auf dem Server) 	konsoleH DB-Verwaltung
+
+## Codesniper Security Check
+
+FIX 1: JWT Decoded Without Verification in Password Reset
+-  The signature was never verified against the secret for passwort reset tokens. So it was very vulnerable to attackers.
+
+FIX 2: Complete Lack of Authentication and Authorization on Socket.io Event Handlers
+-  Events such as 'speech' were not authenticated, so anyone could potentially send speech data to the server or hijack sessions.
+
+FIX 3: Insecure Direct Object Reference (IDOR) in Session Retrieval Endpoint
+- Unauthorized users could still participate in sessions. There was no Authorization check to verify if the user was the imam or a registered participant.
