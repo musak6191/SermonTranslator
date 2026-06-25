@@ -21,7 +21,7 @@ app.set('trust proxy', 1);
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: 'http://zermon.de',
+    origin: process.env.NODE_ENV === 'production' ? 'https://zermon.de' : 'http://localhost:5173',
     methods: ['GET', 'POST']
   }
 });
@@ -41,7 +41,7 @@ const prisma = new PrismaClient();
 // ============================================================================
 app.use(express.json());
 app.use(cors({
-  origin: 'http://zermon.de',
+  origin: process.env.NODE_ENV === 'production' ? 'https://zermon.de' : 'http://localhost:5173',
   credentials: true
 }));
 app.use(cookieParser());
@@ -100,6 +100,9 @@ async function translateText(text, targetLang) {
 let connectedClients = 0;
 let sessionActive = false;
 
+const { RateLimiterMemory } = require('rate-limiter-flexible');
+const speechLimiter = new RateLimiterMemory({ points: 5, duration: 10 });
+
 io.use((socket, next) => {
   const cookies = require('cookie').parse(socket.handshake.headers.cookie || '');
   const token = cookies.token;
@@ -126,7 +129,13 @@ io.on('connection', (socket) => {
   });
 
   // Handle speech input and translation
-  socket.on('speech', (data) => {
+  socket.on('speech', async (data) => {
+    try {
+      await speechLimiter.consume(socket.handshake.address);
+    } catch (rej) {
+      return socket.emit('error', 'Rate limit exceeded');
+    }
+
     if (!data?.sessionId) {
       return;
     }

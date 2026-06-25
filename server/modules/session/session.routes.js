@@ -9,7 +9,8 @@ const createSessionRouter = (io) => {
     const userId = req.user.userId;
 
     try {
-      const newSession = await createSession(req.body, userId);
+      const { title, description } = req.body;
+      const newSession = await createSession({ title, description }, userId);
       res.status(201).json({
         message: 'Session created successfully',
         session: newSession
@@ -25,10 +26,9 @@ const createSessionRouter = (io) => {
 
   sessionRouter.get('/', authenticate, async (req, res) => {
     const userId = req.user.userId;
-    const sessionData = { ...req.body };
 
     try {
-      const sessions = await getAllSession(sessionData, userId);
+      const sessions = await getAllSession({}, userId);
       res.status(200).json(sessions);
     } catch (error) {
       if (error.status && error.payload) {
@@ -40,7 +40,7 @@ const createSessionRouter = (io) => {
 
   sessionRouter.post('/:id/join', authenticate, async (req, res) => {
     const userId = req.user.userId;
-    const sessionData = { ...req.body, id: req.params.id };
+    const sessionData = { id: req.params.id };
 
     try {
       const result = await joinSession(sessionData, userId);
@@ -55,7 +55,7 @@ const createSessionRouter = (io) => {
 
   sessionRouter.post('/:id/end', authenticate, async (req, res) => {
     const userId = req.user.userId;
-    const sessionData = { ...req.body, id: req.params.id };
+    const sessionData = { id: req.params.id };
 
     try {
       const result = await endSession(sessionData, userId);
@@ -73,7 +73,7 @@ const createSessionRouter = (io) => {
 
   sessionRouter.get('/:id', authenticate, async (req, res) => {
     const userId = req.user.userId;
-    const sessionData = { ...req.body, id: req.params.id };
+    const sessionData = { id: req.params.id };
 
     try {
       const session = await getSession(sessionData, userId);

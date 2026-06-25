@@ -166,7 +166,8 @@ const requestPasswordChange = async (data, userId) => {
 
   const secret = process.env.JWT_SECRET + user.password;
   const token = jwt.sign({ userId: user.id }, secret, { expiresIn: '15m' });
-  const resetUrl = `http://localhost:5173/settings?token=${token}`;
+  const clientBaseUrl = process.env.CLIENT_BASE_URL || 'http://localhost:5173';
+  const resetUrl = `${clientBaseUrl}/settings?token=${token}`;
 
   return {
     email: user.email,
@@ -187,8 +188,10 @@ const resetPasswordWithToken = async (data, userId) => {
     throw error;
   }
 
-  const decoded = jwt.decode(token);
-  if (!decoded || !decoded.userId) {
+  // Pre-decode without verification only to extract userId for building the verification secret.
+  // Full cryptographic verification is performed below with jwt.verify().
+  const preDecoded = jwt.decode(token);
+  if (!preDecoded || !preDecoded.userId) {
     const error = new Error('Invalid token');
     error.status = 400;
     error.payload = {
@@ -198,7 +201,7 @@ const resetPasswordWithToken = async (data, userId) => {
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: decoded.userId }
+    where: { id: preDecoded.userId }
   });
 
   if (!user) {

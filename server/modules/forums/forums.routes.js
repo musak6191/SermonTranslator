@@ -6,10 +6,9 @@ const forumsRouter = express.Router();
 
 forumsRouter.get('/', authenticate, async (req, res) => {
   const userId = req.user.userId;
-  const requestData = { ...req.body };
 
   try {
-    const forums = await getAllForums(requestData, userId);
+    const forums = await getAllForums({}, userId);
     res.status(200).json(forums);
   } catch (error) {
     console.error('Fetch forums error:', error);
@@ -22,10 +21,10 @@ forumsRouter.get('/', authenticate, async (req, res) => {
 
 forumsRouter.post('/', authenticate, async (req, res) => {
   const userId = req.user.userId;
-  const requestData = { ...req.body };
+  const { title, content } = req.body;
 
   try {
-    const newPost = await createForumPost(requestData, userId);
+    const newPost = await createForumPost({ title, content }, userId);
     res.status(201).json({
       message: 'Forum post created successfully',
       post: newPost
@@ -41,7 +40,7 @@ forumsRouter.post('/', authenticate, async (req, res) => {
 
 forumsRouter.get('/:id/comments', authenticate, async (req, res) => {
   const userId = req.user.userId;
-  const requestData = { ...req.body, id: req.params.id };
+  const requestData = { id: req.params.id };
 
   try {
     const comments = await getSpecificComments(requestData, userId);
@@ -57,7 +56,8 @@ forumsRouter.get('/:id/comments', authenticate, async (req, res) => {
 
 forumsRouter.post('/:id/comments', authenticate, async (req, res) => {
   const userId = req.user.userId;
-  const requestData = { ...req.body, id: req.params.id };
+  const { content, parentId, repliedToName } = req.body;
+  const requestData = { id: req.params.id, content, parentId, repliedToName };
 
   try {
     const newComment = await createComment(requestData, userId);

@@ -25,10 +25,9 @@ usersRouter.post('/', authenticate, async (req, res) => {
 
 usersRouter.get('/', authenticate, async (req, res) => {
   const userId = req.user.userId;
-  const requestData = { ...req.body };
 
   try {
-    const users = await getAllUser(requestData, userId);
+    const users = await getAllUser({}, userId);
     res.status(200).json(users);
   } catch (error) {
     console.error('Fetch users error:', error);

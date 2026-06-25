@@ -66,11 +66,11 @@ const sendPasswordResetEmail = async (email, resetUrl) => {
 };
 
 authRouter.post('/register', registerLimiter, async (req, res) => {
-  const requestData = { ...req.body };
+  const { name, email, password, role } = req.body;
   const userId = req.user?.userId;
 
   try {
-    const newUser = await registerUser(requestData, userId);
+    const newUser = await registerUser({ name, email, password, role }, userId);
     res.status(201).json({
       message: 'User registered successfully',
       user: newUser
@@ -85,11 +85,11 @@ authRouter.post('/register', registerLimiter, async (req, res) => {
 });
 
 authRouter.post('/login', loginLimiter, async (req, res) => {
-  const requestData = { ...req.body };
+  const { email, password } = req.body;
   const userId = req.user?.userId;
 
   try {
-    const user = await loginUser(requestData, userId);
+    const user = await loginUser({ email, password }, userId);
     const token = require('jsonwebtoken').sign(
       {
         userId: user.id,
@@ -125,11 +125,10 @@ authRouter.post('/login', loginLimiter, async (req, res) => {
 });
 
 authRouter.post('/logout', async (req, res) => {
-  const requestData = { ...req.body };
   const userId = req.user?.userId;
 
   try {
-    const result = await logoutUser(requestData, userId);
+    const result = await logoutUser({}, userId);
     res.clearCookie('token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -147,10 +146,9 @@ authRouter.post('/logout', async (req, res) => {
 
 authRouter.get('/me', authenticate, async (req, res) => {
   const userId = req.user.userId;
-  const requestData = { ...req.body };
 
   try {
-    const user = await getCurrentUserInfo(requestData, userId);
+    const user = await getCurrentUserInfo({}, userId);
     res.status(200).json({ user });
   } catch (error) {
     console.error('Fetch current user info error:', error);
@@ -162,11 +160,10 @@ authRouter.get('/me', authenticate, async (req, res) => {
 });
 
 authRouter.post('/request-password-change', authenticate, async (req, res) => {
-  const requestData = { ...req.body };
   const userId = req.user.userId;
 
   try {
-    const result = await requestPasswordChange(requestData, userId);
+    const result = await requestPasswordChange({}, userId);
     sendPasswordResetEmail(result.email, result.resetUrl);
     res.status(200).json({ message: result.message });
   } catch (error) {
@@ -179,11 +176,11 @@ authRouter.post('/request-password-change', authenticate, async (req, res) => {
 });
 
 authRouter.post('/reset-password-with-token', async (req, res) => {
-  const requestData = { ...req.body };
+  const { token, newPassword } = req.body;
   const userId = null;
 
   try {
-    const result = await resetPasswordWithToken(requestData, userId);
+    const result = await resetPasswordWithToken({ token, newPassword }, userId);
     res.status(200).json(result);
   } catch (error) {
     console.error('Password reset error:', error);

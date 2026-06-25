@@ -6,7 +6,8 @@ const pushRouter = express.Router();
 
 pushRouter.post('/subscribe', authenticate, async (req, res) => {
   const userId = req.user.userId;
-  const requestData = { ...req.body };
+  const { endpoint, keys } = req.body;
+  const requestData = { endpoint, keys };
 
   try {
     const subscription = await savePushSubscription(requestData, userId);

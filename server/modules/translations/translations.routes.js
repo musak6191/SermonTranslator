@@ -6,10 +6,9 @@ const translationsRouter = express.Router();
 
 translationsRouter.get('/', authenticate, async (req, res) => {
   const userId = req.user.userId;
-  const requestData = { ...req.body };
 
   try {
-    const translations = await getAllTranslations(requestData, userId);
+    const translations = await getAllTranslations({}, userId);
     res.status(200).json(translations);
   } catch (error) {
     console.error('Fetch translations error:', error);
@@ -22,7 +21,7 @@ translationsRouter.get('/', authenticate, async (req, res) => {
 
 translationsRouter.get('/:id', authenticate, async (req, res) => {
   const userId = req.user.userId;
-  const requestData = { ...req.body, id: req.params.id };
+  const requestData = { id: req.params.id };
 
   try {
     const translation = await getTranslation(requestData, userId);
@@ -38,7 +37,8 @@ translationsRouter.get('/:id', authenticate, async (req, res) => {
 
 translationsRouter.post('/', authenticate, async (req, res) => {
   const userId = req.user.userId;
-  const requestData = { ...req.body };
+  const { sessionId, originalText, translatedText, language } = req.body;
+  const requestData = { sessionId, originalText, translatedText, language };
 
   try {
     const newTranslation = await createTranslation(requestData, userId);
@@ -57,7 +57,8 @@ translationsRouter.post('/', authenticate, async (req, res) => {
 
 translationsRouter.put('/:id', authenticate, async (req, res) => {
   const userId = req.user.userId;
-  const requestData = { ...req.body, id: req.params.id };
+  const { sessionId, originalText, translatedText, language } = req.body;
+  const requestData = { id: req.params.id, sessionId, originalText, translatedText, language };
 
   try {
     const updatedTranslation = await replaceTranslation(requestData, userId);
