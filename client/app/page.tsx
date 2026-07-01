@@ -49,13 +49,16 @@ export default function Page() {
   }
 
   return (
-    <main className="min-h-screen bg-background px-4 py-10 sm:px-6 lg:px-8">
+    <main className="relative min-h-screen overflow-hidden bg-[#eef7ec] px-4 py-10 sm:px-6 lg:px-8">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-full bg-[radial-gradient(circle_at_top,_rgba(24,191,35,0.18),_transparent_50%)]" />
+      <div className="pointer-events-none absolute -right-20 -top-10 h-[30rem] w-[30rem] rounded-full bg-[#d9f5dd]/60 blur-[120px]" />
+
       <div className="mx-auto flex max-w-7xl flex-col gap-20">
         <section className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-center">
           <div className="max-w-2xl space-y-8">
-            <div className="inline-flex rounded-full border border-[#dbeade] bg-white/80 px-4 py-1 text-sm font-semibold uppercase tracking-[0.3em] text-brandDark/75">
+            <p className="text-sm font-semibold font-serif tracking-[-0.06em] text-brand">
               Zermon
-            </div>
+            </p>
 
             <div className="space-y-5">
               <h1 className="font-serif text-4xl font-black tracking-[-0.04em] text-brandDark sm:text-5xl lg:text-6xl">
