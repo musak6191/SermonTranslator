@@ -134,13 +134,13 @@ export default function Page() {
           </div>
 
           <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
-            <Card className="space-y-6">
+            <Card className="space-y-6 bg-surface border border-[#dbeade]">
               <h3 className="font-serif text-3xl font-bold text-brandDark">Real-Time AI Translation</h3>
               <p className="text-textMuted leading-8">
                 Proprietary AI models trained on religious texts ensure theological accuracy and cultural sensitivity in every sentence.
               </p>
             </Card>
-            <Card className="space-y-4 bg-[#eef7ec] border-[#dbeade]">
+            <Card className="space-y-4 bg-brand/10 border border-brand/20">
               <h3 className="font-serif text-3xl font-bold text-brandDark">Sacred Minimalism</h3>
               <p className="text-textMuted leading-7">
                 A distraction-free UI designed to let you focus solely on the message and your spiritual growth.
@@ -164,17 +164,21 @@ export default function Page() {
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-[#dbeade] bg-white/95 p-10 shadow-[0_24px_80px_rgba(17,45,22,0.08)]">
+        <section className="rounded-[2rem] bg-brand text-white p-10 shadow-[0_24px_80px_rgba(17,45,22,0.16)]">
           <div className="flex flex-col items-center justify-between gap-6 text-center lg:flex-row lg:text-left">
             <div className="max-w-2xl">
-              <h2 className="font-serif text-3xl font-bold text-brandDark sm:text-4xl">
+              <h2 className="font-serif text-3xl font-bold text-white sm:text-4xl">
                 Join the Zermon community today.
               </h2>
-              <p className="mt-4 text-textMuted leading-7">
+              <p className="mt-4 text-white/80 leading-7">
                 Start your journey towards a deeper, more inclusive spiritual experience. No credit card required.
               </p>
             </div>
-            <Button onClick={() => router.push('/register')} className="w-full max-w-sm sm:w-auto">
+            <Button
+              onClick={() => router.push('/register')}
+              variant="secondary"
+              className="w-full max-w-sm sm:w-auto bg-white text-brandDark hover:bg-slate-100"
+            >
               Be part of it
             </Button>
           </div>
