@@ -136,10 +136,10 @@ export default function Page() {
             </p>
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
+          <div className="grid bg-brandDark gap-6 xl:grid-cols-[1.4fr_1fr]">
             <Card className="space-y-6 bg-surface border border-[#dbeade]">
-              <h3 className="font-serif text-3xl font-bold text-brandDark">Real-Time AI Translation</h3>
-              <p className="text-textMuted leading-8">
+              <h3 className="font-serif text-3xl font-bold text-background">Real-Time AI Translation</h3>
+              <p className="text-backgroundSoft leading-8">
                 Proprietary AI models trained on religious texts ensure theological accuracy and cultural sensitivity in every sentence.
               </p>
             </Card>
@@ -151,7 +151,7 @@ export default function Page() {
             </Card>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2 bg-border">
             <Card className="space-y-4 bg-[#eef7ec] border border-[#dbeade]">
               <h4 className="font-serif text-2xl font-semibold text-brandDark">Past Sermon Archive</h4>
               <p className="text-textMuted leading-7">
@@ -167,10 +167,10 @@ export default function Page() {
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-[#dbeade] bg-white/95 p-14 shadow-[0_24px_80px_rgba(17,45,22,0.08)]">
+        <section className="rounded-[2rem] border border-[#dbeade] h-[25vh] bg-brandDark p-14 shadow-[0_24px_80px_rgba(17,45,22,0.08)]">
           <div className="flex flex-col items-center justify-between gap-6 text-center lg:flex-row lg:text-left">
             <div className="max-w-2xl">
-              <h2 className="font-serif text-3xl font-bold text-brandDark sm:text-4xl">
+              <h2 className="font-serif text-3xl font-bold text-backgroundSoft sm:text-4xl">
                 Join the Zermon community today.
               </h2>
               <p className="mt-4 text-textMuted leading-8">
