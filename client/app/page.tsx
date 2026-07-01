@@ -67,7 +67,7 @@ export default function Page() {
             </div>
 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-              <Button onClick={() => router.push('/login')} className="sm:w-auto">
+              <Button onClick={() => router.push('/register')} className="sm:w-auto">
                 Be part of it
               </Button>
               <Button variant="secondary" onClick={() => router.push('/login')} className="sm:w-auto">
@@ -174,7 +174,7 @@ export default function Page() {
                 Start your journey towards a deeper, more inclusive spiritual experience. No credit card required.
               </p>
             </div>
-            <Button onClick={() => router.push('/login')} className="w-full max-w-sm sm:w-auto">
+            <Button onClick={() => router.push('/register')} className="w-full max-w-sm sm:w-auto">
               Be part of it
             </Button>
           </div>
