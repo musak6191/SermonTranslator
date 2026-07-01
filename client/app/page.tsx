@@ -138,8 +138,8 @@ export default function Page() {
 
           <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
             <Card className="space-y-6 bg-brandDark border border-[#dbeade]">
-              <h3 className="font-serif text-3xl font-bold text-background">Real-Time AI Translation</h3>
-              <p className="text-backgroundSoft leading-8">
+              <h3 className="font-serif text-3xl font-bold text-brandDark">Real-Time AI Translation</h3>
+              <p className="text-textMuted leading-8">
                 Proprietary AI models trained on religious texts ensure theological accuracy and cultural sensitivity in every sentence.
               </p>
             </Card>
