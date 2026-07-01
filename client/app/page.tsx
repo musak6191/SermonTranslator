@@ -178,8 +178,6 @@ export default function Page() {
             </Card>
           </div>
         </section>
-
-        </section>
       </div>
 
       <section className="relative w-full px-4 sm:px-6 lg:px-8">
