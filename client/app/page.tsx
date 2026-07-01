@@ -136,8 +136,8 @@ export default function Page() {
             </p>
           </div>
 
-          <div className="grid bg-brandDark gap-6 xl:grid-cols-[1.4fr_1fr]">
-            <Card className="space-y-6 bg-surface border border-[#dbeade]">
+          <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
+            <Card className="space-y-6 bg-brandDark border border-[#dbeade]">
               <h3 className="font-serif text-3xl font-bold text-background">Real-Time AI Translation</h3>
               <p className="text-backgroundSoft leading-8">
                 Proprietary AI models trained on religious texts ensure theological accuracy and cultural sensitivity in every sentence.
@@ -151,14 +151,14 @@ export default function Page() {
             </Card>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 bg-border">
+          <div className="grid gap-6 md:grid-cols-2">
             <Card className="space-y-4 bg-[#eef7ec] border border-[#dbeade]">
               <h4 className="font-serif text-2xl font-semibold text-brandDark">Past Sermon Archive</h4>
               <p className="text-textMuted leading-7">
                 Access a library of translated sermons. Revisit teachings anytime, anywhere, with saved notes and bookmarks.
               </p>
             </Card>
-            <Card className="space-y-4 bg-surfaceSoft border border-[#d9f5dd]">
+            <Card className="space-y-4 bg-border border border-[#d9f5dd]">
               <h4 className="font-serif text-2xl font-semibold text-brandDark">Community Discussion</h4>
               <p className="text-textMuted leading-7">
                 Connect with others globally. Discuss sermons, share insights, and build a borderless spiritual community.
@@ -167,7 +167,7 @@ export default function Page() {
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-[#dbeade] h-[25vh] bg-brandDark p-14 shadow-[0_24px_80px_rgba(17,45,22,0.08)]">
+        <section className="rounded-[2rem] border border-[#dbeade] bg-brandDark p-14 shadow-[0_24px_80px_rgba(17,45,22,0.08)]">
           <div className="flex flex-col items-center justify-between gap-6 text-center lg:flex-row lg:text-left">
             <div className="max-w-2xl">
               <h2 className="font-serif text-3xl font-bold text-backgroundSoft sm:text-4xl">
