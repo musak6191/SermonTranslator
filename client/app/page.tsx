@@ -186,6 +186,7 @@ export default function Page() {
             </Button>
           </div>
         </section>
+      </div>
     </main>
   )
 }
