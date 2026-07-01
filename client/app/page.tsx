@@ -138,7 +138,7 @@ export default function Page() {
 
           <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
             <Card className="space-y-6 bg-surface border border-[#dbeade]">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brandDark">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brand">
                 <span className="text-xl">⚡</span>
               </div>
               <h3 className="font-serif text-3xl font-bold text-brandDark">Real-Time AI Translation</h3>
@@ -147,8 +147,8 @@ export default function Page() {
               </p>
             </Card>
             <Card className="space-y-4 bg-backgroundSoft/90 border border-backgroundSoft">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-brandDark shadow-sm">
-                <span className="text-xl">🕊️</span>
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brand">
+                <span className="text-xl">🕊</span>
               </div>
               <h3 className="font-serif text-3xl font-bold text-brandDark">Sacred Minimalism</h3>
               <p className="text-textMuted leading-7">
@@ -159,7 +159,7 @@ export default function Page() {
 
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="space-y-4 border border-[#dbeade] bg-white/95">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eef7ec] text-brandDark">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brand">
                 <span className="text-xl">📚</span>
               </div>
               <h4 className="font-serif text-2xl font-semibold text-brandDark">Past Sermon Archive</h4>
@@ -168,7 +168,7 @@ export default function Page() {
               </p>
             </Card>
             <Card className="space-y-4 border border-[#d9f5dd] bg-surfaceSoft">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brandDark">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brand">
                 <span className="text-xl">🤝</span>
               </div>
               <h4 className="font-serif text-2xl font-semibold text-brandDark">Community Discussion</h4>
@@ -180,8 +180,8 @@ export default function Page() {
         </section>
       </div>
 
-      <section className="relative w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex w-full flex-col items-center justify-between gap-6 rounded-[2rem] bg-brand text-white p-10 shadow-[0_24px_80px_rgba(17,45,22,0.16)] lg:flex-row lg:text-left">
+      <section className="relative w-full px-4 sm:px-6 lg:px-8 mt-16">
+        <div className="flex w-full flex-col items-center justify-between gap-6 bg-brand text-white p-10 shadow-[0_24px_80px_rgba(17,45,22,0.16)] lg:flex-row lg:text-left">
           <div className="max-w-2xl text-center lg:text-left">
             <h2 className="font-serif text-3xl font-bold text-white sm:text-4xl">
               Join the Zermon community today.
