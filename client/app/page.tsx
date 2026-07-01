@@ -138,18 +138,12 @@ export default function Page() {
 
           <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
             <Card className="space-y-6 bg-surface border border-[#dbeade]">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-                <span className="text-xl">⚡</span>
-              </div>
               <h3 className="font-serif text-3xl font-bold text-brandDark">Real-Time AI Translation</h3>
               <p className="text-textMuted leading-8">
                 Proprietary AI models trained on religious texts ensure theological accuracy and cultural sensitivity in every sentence.
               </p>
             </Card>
             <Card className="space-y-4 bg-backgroundSoft/90 border border-backgroundSoft">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-                <span className="text-xl">🕊</span>
-              </div>
               <h3 className="font-serif text-3xl font-bold text-brandDark">Sacred Minimalism</h3>
               <p className="text-textMuted leading-7">
                 A distraction-free UI designed to let you focus solely on the message and your spiritual growth.
@@ -158,19 +152,13 @@ export default function Page() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="space-y-4 border border-[#dbeade] bg-white/95">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-                <span className="text-xl">📚</span>
-              </div>
+            <Card className="space-y-4 bg-[#eef7ec] border border-[#dbeade]">
               <h4 className="font-serif text-2xl font-semibold text-brandDark">Past Sermon Archive</h4>
               <p className="text-textMuted leading-7">
                 Access a library of translated sermons. Revisit teachings anytime, anywhere, with saved notes and bookmarks.
               </p>
             </Card>
-            <Card className="space-y-4 border border-[#d9f5dd] bg-surfaceSoft">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-                <span className="text-xl">🤝</span>
-              </div>
+            <Card className="space-y-4 bg-surfaceSoft border border-[#d9f5dd]">
               <h4 className="font-serif text-2xl font-semibold text-brandDark">Community Discussion</h4>
               <p className="text-textMuted leading-7">
                 Connect with others globally. Discuss sermons, share insights, and build a borderless spiritual community.
@@ -178,27 +166,26 @@ export default function Page() {
             </Card>
           </div>
         </section>
-      </div>
 
-      <section className="relative w-full px-4 sm:px-6 lg:px-8 mt-16">
-        <div className="flex w-full flex-col items-center justify-between gap-6 bg-brand text-white p-10 shadow-[0_24px_80px_rgba(17,45,22,0.16)] lg:flex-row lg:text-left">
-          <div className="max-w-2xl text-center lg:text-left">
-            <h2 className="font-serif text-3xl font-bold text-white sm:text-4xl">
-              Join the Zermon community today.
-            </h2>
-            <p className="mt-4 text-white/80 leading-7">
-              Start your journey towards a deeper, more inclusive spiritual experience. No credit card required.
-            </p>
+        <section className="rounded-[2rem] border border-[#dbeade] bg-white/95 p-14 shadow-[0_24px_80px_rgba(17,45,22,0.08)]">
+          <div className="flex flex-col items-center justify-between gap-6 text-center lg:flex-row lg:text-left">
+            <div className="max-w-2xl">
+              <h2 className="font-serif text-3xl font-bold text-brandDark sm:text-4xl">
+                Join the Zermon community today.
+              </h2>
+              <p className="mt-4 text-textMuted leading-8">
+                Start your journey towards a deeper, more inclusive spiritual experience. No credit card required.
+              </p>
+            </div>
+            <Button
+              onClick={() => router.push('/register')}
+              variant="secondary"
+              className="w-full max-w-sm sm:w-auto bg-white text-brandDark hover:bg-slate-100"
+            >
+              Be part of it
+            </Button>
           </div>
-          <Button
-            onClick={() => router.push('/register')}
-            variant="secondary"
-            className="w-full max-w-sm sm:w-auto bg-white text-brandDark hover:bg-slate-100"
-          >
-            Be part of it
-          </Button>
-        </div>
-      </section>
+        </section>
     </main>
   )
 }
