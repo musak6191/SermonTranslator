@@ -25,12 +25,14 @@ export default function ActiveSessionPage() {
   const [session, setSession] = useState<Session | null>(null)
   const [segments, setSegments] = useState<string[]>([])
   const [sessionTime, setSessionTime] = useState(0)
-  const [debugInput, setDebugInput] = useState('')
+  const [isListening, setIsListening] = useState(false)
+  const [listeningError, setListeningError] = useState<string | null>(null)
   const [isEnding, setIsEnding] = useState(false)
   
   const socketRef = useRef<Socket | null>(null)
   const recognitionRef = useRef<any>(null)
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const isStoppingRef = useRef(false)
 
   // Fetch active session on mount
   useEffect(() => {
@@ -61,73 +63,98 @@ export default function ActiveSessionPage() {
 
   // Initialize Socket and Speech Recognition
   useEffect(() => {
-    if (!session?.id) return; // Wait until session is loaded
+    if (!session?.id) return
 
-    socketRef.current = io(apiBaseUrl) // Connect to backend
-    
-    // Start session on socket
+    setIsListening(false)
+    setListeningError(null)
+
+    socketRef.current = io(apiBaseUrl)
     socketRef.current.emit('startSession', { sessionId: session.id })
 
-    // Timer based on session creation time
     if (session.createdAt) {
       const startTimestamp = new Date(session.createdAt).getTime()
-      
-      // Initial set
       setSessionTime(Math.floor((Date.now() - startTimestamp) / 1000))
-      
-      // Update every second
+
       timerRef.current = setInterval(() => {
         setSessionTime(Math.floor((Date.now() - startTimestamp) / 1000))
       }, 1000)
     }
 
-    // Speech Recognition
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    if (SpeechRecognition) {
-      recognitionRef.current = new SpeechRecognition()
-      recognitionRef.current.continuous = true
-      recognitionRef.current.interimResults = true
-      recognitionRef.current.lang = 'tr-TR' // Turkish
+    const SpeechRecognition =
+      (window as typeof window & { SpeechRecognition?: any; webkitSpeechRecognition?: any }).SpeechRecognition ||
+      (window as typeof window & { SpeechRecognition?: any; webkitSpeechRecognition?: any }).webkitSpeechRecognition
 
-      recognitionRef.current.onresult = (event: any) => {
-        let finalTranscript = ''
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript + ' '
-          }
-        }
-        
-        finalTranscript = finalTranscript.trim()
-        if (finalTranscript) {
-          // Send to translation backend
-          socketRef.current?.emit('speech', { sessionId: session.id, text: finalTranscript })
-          
-          // Add to local UI array
-          setSegments(prev => {
-            const updated = [...prev, finalTranscript]
-            // Keep only the last 4 segments
-            if (updated.length > 4) {
-              return updated.slice(updated.length - 4)
-            }
-            return updated
-          })
+    if (!SpeechRecognition) {
+      setListeningError('Speech recognition is not supported in this browser. Please use Chrome or Edge.')
+      return
+    }
+
+    recognitionRef.current = new SpeechRecognition()
+    recognitionRef.current.continuous = true
+    recognitionRef.current.interimResults = true
+    recognitionRef.current.lang = 'tr-TR'
+
+    recognitionRef.current.onstart = () => {
+      setIsListening(true)
+      setListeningError(null)
+    }
+
+    recognitionRef.current.onresult = (event: any) => {
+      let finalTranscript = ''
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript + ' '
         }
       }
 
-      recognitionRef.current.onend = () => {
-        // Auto-restart if we haven't explicitly stopped
-        if (socketRef.current) {
+      finalTranscript = finalTranscript.trim()
+      if (!finalTranscript) return
+
+      socketRef.current?.emit('speech', { sessionId: session.id, text: finalTranscript })
+
+      setSegments((prev: string[]) => {
+        const updated = [...prev, finalTranscript]
+        return updated.length > 4 ? updated.slice(updated.length - 4) : updated
+      })
+    }
+
+    recognitionRef.current.onerror = (event: any) => {
+      const error = event?.error
+      if (error === 'not-allowed' || error === 'service-not-allowed') {
+        setListeningError('Microphone access was blocked. Please allow microphone access and refresh the page.')
+      } else if (error !== 'aborted') {
+        setListeningError('Speech recognition stopped unexpectedly. Please try again.')
+      }
+      setIsListening(false)
+    }
+
+    recognitionRef.current.onend = () => {
+      setIsListening(false)
+      if (isStoppingRef.current) {
+        isStoppingRef.current = false
+        return
+      }
+
+      if (socketRef.current) {
+        try {
           recognitionRef.current?.start()
+        } catch (error) {
+          console.error('Failed to restart speech recognition', error)
         }
       }
-      
-      // Start listening
+    }
+
+    try {
       recognitionRef.current.start()
+    } catch (error) {
+      console.error('Failed to start speech recognition', error)
+      setListeningError('Could not start microphone listening. Please refresh the page and try again.')
     }
 
     return () => {
+      isStoppingRef.current = true
       socketRef.current?.disconnect()
-      socketRef.current = null // indicate intentional stop
+      socketRef.current = null
       recognitionRef.current?.stop()
       if (timerRef.current) clearInterval(timerRef.current)
     }
@@ -151,7 +178,9 @@ export default function ActiveSessionPage() {
     }
 
     // Stop local resources
+    isStoppingRef.current = true
     recognitionRef.current?.stop()
+    setIsListening(false)
     if (timerRef.current) clearInterval(timerRef.current)
 
     // Delay disconnect and redirect so cleanup can complete
@@ -169,27 +198,6 @@ export default function ActiveSessionPage() {
     const mins = Math.floor((seconds % 3600) / 60)
     const secs = seconds % 60
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-  }
-
-  const handleSendDebugSpeech = (e?: React.FormEvent) => {
-    if (e) e.preventDefault()
-    const trimmed = debugInput.trim()
-    if (!trimmed || !session?.id) return
-
-    // Emit identical 'speech' socket event to the backend
-    socketRef.current?.emit('speech', { sessionId: session.id, text: trimmed })
-
-    // Add to local UI array
-    setSegments(prev => {
-      const updated = [...prev, trimmed]
-      // Keep only the last 4 segments
-      if (updated.length > 4) {
-        return updated.slice(updated.length - 4)
-      }
-      return updated
-    })
-
-    setDebugInput('')
   }
 
   return (
@@ -268,32 +276,18 @@ export default function ActiveSessionPage() {
         </div>
       </div>
 
-      {/* Debug Keyboard Input Panel */}
-      <div className="mx-auto w-full max-w-4xl mb-8 p-4 rounded-xl border border-dashed border-[#288C49]/40 bg-white/60 backdrop-blur-sm shadow-sm transition-all hover:border-[#288C49]/60">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="inline-flex items-center rounded-md bg-[#288C49]/10 px-2 py-1 text-xs font-semibold text-[#288C49] ring-1 ring-inset ring-[#288C49]/20">
-            Speech Debug Input
-          </span>
-          <span className="text-xs text-[#288C49]/70 font-medium">
-            Imam speech simulation console (Type here and hit Send/Enter to simulate sermon voice data)
+      <div className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between rounded-xl border border-[#288C49]/20 bg-white/70 px-4 py-3 shadow-sm backdrop-blur-sm">
+        <div className="flex items-center gap-3">
+          <span className={`h-2.5 w-2.5 rounded-full ${isListening ? 'bg-green-600 animate-pulse' : 'bg-gray-400'}`} />
+          <span className="text-sm font-semibold text-[#144f2d]">
+            {isListening ? 'Listening for sermon speech' : 'Microphone ready'}
           </span>
         </div>
-        <form onSubmit={handleSendDebugSpeech} className="flex gap-3">
-          <input
-            type="text"
-            value={debugInput}
-            onChange={(e) => setDebugInput(e.target.value)}
-            placeholder="Enter simulated sermon speech..."
-            className="flex-1 rounded-lg border border-[#288C49]/20 bg-white px-4 py-2.5 text-sm text-[#144f2d] placeholder-[#144f2d]/30 shadow-inner focus:border-[#288C49]/50 focus:outline-none focus:ring-1 focus:ring-[#288C49]/50 transition-all font-serif"
-          />
-          <button
-            type="submit"
-            disabled={!debugInput.trim()}
-            className="rounded-lg bg-[#288C49] px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#1a6632] disabled:opacity-40 disabled:hover:bg-[#288C49] transition-all duration-150 active:scale-[0.98]"
-          >
-            Send Speech
-          </button>
-        </form>
+        {listeningError ? (
+          <span className="text-sm text-red-600">{listeningError}</span>
+        ) : (
+          <span className="text-sm text-[#288C49]">Live speech-to-text is active</span>
+        )}
       </div>
 
       {/* End Session Button */}
