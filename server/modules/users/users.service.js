@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const createUser = async (data, userId) => {
-  const { name, role } = data;
+  const { name, role, email, password } = data;
 
   if (!name || !role) {
     const error = new Error('Missing required fields');
@@ -23,10 +23,16 @@ const createUser = async (data, userId) => {
     throw error;
   }
 
+  // Provide defaults for email and password if not supplied
+  const userEmail = email || `${name.replace(/\s+/g, '').toLowerCase()}-${Date.now()}@generated.local`;
+  const userPassword = password || 'defaultPassword123';
+
   const newUser = await prisma.user.create({
     data: {
       name: name.trim(),
-      role: role.trim()
+      role: role.trim(),
+      email: userEmail,
+      password: userPassword
     }
   });
 

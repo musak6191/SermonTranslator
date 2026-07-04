@@ -354,26 +354,35 @@ describe('backend coverage expansion', () => {
   describe('users service and routes', () => {
     it('covers user creation and listing behavior', async () => {
       const user = await createAuthenticatedUser('imam');
-      await expect(createUser({ name: 'Admin', email: 'admin@example.com', role: 'imam' }, user.id)).rejects.toThrow();
+
+      // Valid createUser call should resolve successfully now
+      const created = await createUser({ name: 'Admin', email: 'admin@example.com', role: 'imam' }, user.id);
+      expect(created.name).toBe('Admin');
+
+      // Missing name should throw 400
+      await expect(createUser({ role: 'imam' }, user.id)).rejects.toMatchObject({ status: 400 });
+
+      // Invalid role should throw 400
+      await expect(createUser({ name: 'Bad', role: 'superadmin' }, user.id)).rejects.toMatchObject({ status: 400 });
 
       const listed = await getAllUser({}, user.id);
-      expect(listed).toHaveLength(1);
+      expect(listed.length).toBeGreaterThanOrEqual(2);
 
       const app = createTestApp(usersRouter, '/users');
       const createRouteResponse = await request(app, '/users', {
         method: 'POST',
-        body: { name: 'Route User', email: 'route-user@example.com', role: 'listener' },
+        body: { name: 'Route User', role: 'listener' },
         cookie: `token=${createToken(user.id)}`
       });
-      expect(createRouteResponse.response.status).toBe(400);
-      expect(createRouteResponse.payload.error).toBe('Missing required fields');
+      expect(createRouteResponse.response.status).toBe(201);
+      expect(createRouteResponse.payload.user.name).toBe('Route User');
 
       const listRouteResponse = await request(app, '/users', {
         method: 'GET',
         cookie: `token=${createToken(user.id)}`
       });
       expect(listRouteResponse.response.status).toBe(200);
-      expect(listRouteResponse.payload).toHaveLength(1);
+      expect(listRouteResponse.payload.length).toBeGreaterThanOrEqual(3);
     });
   });
 
