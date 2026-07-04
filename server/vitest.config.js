@@ -7,6 +7,11 @@ export default defineConfig({
     include: ['tests/**/*.test.{js,ts}'],
     maxWorkers: 1,
     minWorkers: 1,
+    server: {
+      deps: {
+        inline: [/@prisma\/client/, /\.prisma\/client/, /web-push/, /resend/, /@react-email\/render/]
+      }
+    },
     coverage: {
       reporter: ['text', 'html', 'lcov', 'json-summary'],
       reportsDirectory: './coverage',
