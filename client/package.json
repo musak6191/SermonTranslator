@@ -6,7 +6,8 @@
     "dev": "next dev --port 5173",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:e2e": "cypress run"
   },
   "dependencies": {
     "next": "^16.2.6",
