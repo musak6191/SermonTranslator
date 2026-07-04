@@ -26,6 +26,16 @@ This application uses the browser's Web Speech API, which requires microphone ac
 
 Die meisten Prompt Iterationen waren Bug fixes, basierend auf dem ersten Prompt. Zudem wurden auch nicht jede Prompts dokumentiert, da ich mir das nicht recht angewöhnt habe.
 
+CODE COVERAGE FROM 04_07_26:
+
+All files
+67.22% Statements 519/772
+51.53% Branches 151/293
+58.49% Functions 31/53
+67.89% Lines 516/760
+
+to test again run npm run test:coverage
+
 # Session 1: Full-Stack Setup
 
 Init Prompt: "Ich will als Prediger, dass meine Predigen auf Zielsprachen übersetzt werden in Echtzeit."
