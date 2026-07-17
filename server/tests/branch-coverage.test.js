@@ -119,11 +119,11 @@ describe('branch coverage suite', () => {
       await expect(registerUser({ name: '', email: 'x', password: 'abc', role: 'listener' }, 1)).rejects.toMatchObject({ status: 400 });
       await expect(registerUser({ name: 'A', email: 'x', password: 'abc', role: 'admin' }, 1)).rejects.toMatchObject({ status: 400 });
       await expect(registerUser({ name: 'A', email: 'x', password: 'weak', role: 'listener' }, 1)).rejects.toMatchObject({ status: 400 });
-      
+
       // Duplicate registration
       await prisma.user.create({ data: { name: 'Existing', email: 'dup@example.com', password: 'hash', role: 'listener' } });
       await expect(registerUser({ name: 'A', email: 'dup@example.com', password: 'StrongP@ss1', role: 'listener' }, 1)).rejects.toMatchObject({ status: 409 });
-      
+
       // Success registration
       await expect(registerUser({ name: 'A', email: 'new@example.com', password: 'StrongP@ss1', role: 'imam' }, 1)).resolves.toMatchObject({ email: 'new@example.com' });
 
@@ -149,13 +149,13 @@ describe('branch coverage suite', () => {
       // resetPasswordWithToken validations
       await expect(resetPasswordWithToken({ token: '', newPassword: 'StrongP@ss1' }, 1)).rejects.toMatchObject({ status: 400 });
       await expect(resetPasswordWithToken({ token: 'badtoken', newPassword: 'StrongP@ss1' }, 1)).rejects.toMatchObject({ status: 400 });
-      
+
       const signed = jwt.sign({ userId: resetUser.id }, 'wrong-secret' + resetUser.password, { expiresIn: '15m' });
       await expect(resetPasswordWithToken({ token: signed, newPassword: 'StrongP@ss1' }, 1)).rejects.toMatchObject({ status: 400 });
-      
+
       const validToken = jwt.sign({ userId: resetUser.id }, 'test-secret' + resetUser.password, { expiresIn: '15m' });
       await expect(resetPasswordWithToken({ token: validToken, newPassword: 'weak' }, 1)).rejects.toMatchObject({ status: 400 });
-      
+
       await expect(resetPasswordWithToken({ token: validToken, newPassword: 'StrongP@ss1' }, 1)).resolves.toMatchObject({ message: 'Password updated successfully' });
     });
   });
@@ -164,10 +164,10 @@ describe('branch coverage suite', () => {
     it('covers session creation, access, join, and end branches', async () => {
       // 1. Session creation
       await expect(createSession({ title: '', description: 'x' }, 1)).rejects.toMatchObject({ status: 400 });
-      
+
       const listener = await prisma.user.create({ data: { name: 'Listener', email: 'listener@example.com', password: 'hash', role: 'listener' } });
       await expect(createSession({ title: 'T', description: 'D' }, listener.id)).rejects.toMatchObject({ status: 403 });
-      
+
       const imam = await prisma.user.create({ data: { name: 'Imam', email: 'imam@example.com', password: 'hash', role: 'imam' } });
       const session = await createSession({ title: ' T ', description: ' D ' }, imam.id);
       expect(session).toMatchObject({ title: 'T', description: 'D' });
@@ -175,7 +175,7 @@ describe('branch coverage suite', () => {
       // 2. Get session
       await expect(getSession({ id: 'bad' }, imam.id)).rejects.toMatchObject({ status: 400 });
       await expect(getSession({ id: '9999' }, imam.id)).rejects.toMatchObject({ status: 404 });
-      
+
       const otherImam = await prisma.user.create({ data: { name: 'Other', email: 'other@example.com', password: 'hash', role: 'imam' } });
       await expect(getSession({ id: String(session.id) }, otherImam.id)).rejects.toMatchObject({ status: 403 });
       await expect(getSession({ id: String(session.id) }, imam.id)).resolves.toMatchObject({ id: session.id });
@@ -189,15 +189,15 @@ describe('branch coverage suite', () => {
       await expect(endSession({ id: 'bad' }, imam.id)).rejects.toMatchObject({ status: 400 });
       await expect(endSession({ id: '9999' }, imam.id)).rejects.toMatchObject({ status: 404 });
       await expect(endSession({ id: String(session.id) }, otherImam.id)).rejects.toMatchObject({ status: 403 });
-      
+
       // End session with participants and translations to cover push subscription logic
       const session2 = await createSession({ title: 'S2', description: 'D2' }, imam.id);
       await joinSession({ id: String(session2.id) }, listener.id);
-      
+
       // Create translation for session2
       await prisma.translation.create({ data: { sessionId: session2.id, originalText: 'Orig', translatedText: 'Trans', language: 'es' } });
       // Create push subscription for listener
-      await prisma.pushSubscription.create({ data: { userId: listener.id, endpoint: 'https://example.com/endpoint', p256dh: 'p', auth: 'a' } });
+      await prisma.pushSubscription.create({ data: { userId: listener.id, endpoint: 'https://example.com/endpoint', p256dh: 'p'.repeat(65), auth: 'a'.repeat(16) } });
 
       await expect(endSession({ id: String(session2.id) }, imam.id)).resolves.toMatchObject({ message: 'Session ended successfully' });
     });
@@ -206,7 +206,7 @@ describe('branch coverage suite', () => {
   describe('translations service', () => {
     it('covers translation CRUD branches', async () => {
       await expect(getAllTranslations({}, undefined)).rejects.toMatchObject({ status: 401 });
-      
+
       const listener = await prisma.user.create({ data: { name: 'L', email: 'l@example.com', password: 'h', role: 'listener' } });
       await expect(getAllTranslations({}, listener.id)).resolves.toEqual([]);
 
@@ -217,19 +217,19 @@ describe('branch coverage suite', () => {
       // Create a session and translation
       const imam = await prisma.user.create({ data: { name: 'Imam', email: 'imam@example.com', password: 'h', role: 'imam' } });
       const session = await createSession({ title: 'T', description: 'D' }, imam.id);
-      
+
       const translation = await prisma.translation.create({ data: { sessionId: session.id, originalText: 'A', translatedText: 'B', language: 'fr' } });
-      
+
       // Get translation
       await expect(getTranslation({ id: String(translation.id) }, listener.id)).resolves.toMatchObject({ id: translation.id });
 
       // Create translation validations
       await expect(createTranslation({ sessionId: '', originalText: 'a', translatedText: 'b', language: 'fr' }, imam.id)).rejects.toMatchObject({ status: 400 });
       await expect(createTranslation({ sessionId: '9999', originalText: 'a', translatedText: 'b', language: 'fr' }, imam.id)).rejects.toMatchObject({ status: 400 });
-      
+
       const otherImam = await prisma.user.create({ data: { name: 'Other', email: 'other@example.com', password: 'h', role: 'imam' } });
       await expect(createTranslation({ sessionId: String(session.id), originalText: 'a', translatedText: 'b', language: 'fr' }, otherImam.id)).rejects.toMatchObject({ status: 403 });
-      
+
       const newTrans = await createTranslation({ sessionId: String(session.id), originalText: 'a', translatedText: 'b', language: 'fr' }, imam.id);
       expect(newTrans).toMatchObject({ originalText: 'a' });
 
@@ -237,10 +237,10 @@ describe('branch coverage suite', () => {
       await expect(replaceTranslation({ id: '', sessionId: String(session.id), originalText: 'a', translatedText: 'b', language: 'fr' }, imam.id)).rejects.toMatchObject({ status: 400 });
       await expect(replaceTranslation({ id: 'abc', sessionId: String(session.id), originalText: 'a', translatedText: 'b', language: 'fr' }, imam.id)).rejects.toMatchObject({ status: 400 });
       await expect(replaceTranslation({ id: '9999', sessionId: String(session.id), originalText: 'a', translatedText: 'b', language: 'fr' }, imam.id)).rejects.toMatchObject({ status: 404 });
-      
+
       await expect(replaceTranslation({ id: String(newTrans.id), sessionId: '9999', originalText: 'a', translatedText: 'b', language: 'fr' }, imam.id)).rejects.toMatchObject({ status: 400 });
       await expect(replaceTranslation({ id: String(newTrans.id), sessionId: String(session.id), originalText: 'a', translatedText: 'b', language: 'fr' }, otherImam.id)).rejects.toMatchObject({ status: 403 });
-      
+
       const replaced = await replaceTranslation({ id: String(newTrans.id), sessionId: String(session.id), originalText: 'updated', translatedText: 'b', language: 'fr' }, imam.id);
       expect(replaced).toMatchObject({ originalText: 'updated' });
 
@@ -249,7 +249,7 @@ describe('branch coverage suite', () => {
       await expect(deleteTranslation({ id: 'abc' }, imam.id)).rejects.toMatchObject({ status: 400 });
       await expect(deleteTranslation({ id: '9999' }, imam.id)).rejects.toMatchObject({ status: 404 });
       await expect(deleteTranslation({ id: String(newTrans.id) }, otherImam.id)).rejects.toMatchObject({ status: 403 });
-      
+
       await expect(deleteTranslation({ id: String(newTrans.id) }, imam.id)).resolves.toBeUndefined();
     });
   });
@@ -257,33 +257,33 @@ describe('branch coverage suite', () => {
   describe('forums and push services', () => {
     it('covers forums, comments, and subscriptions', async () => {
       await expect(getAllForums({}, undefined)).rejects.toMatchObject({ status: 401 });
-      
+
       const user = await prisma.user.create({ data: { name: 'User', email: 'user@example.com', password: 'h', role: 'listener' } });
       await expect(getAllForums({}, user.id)).resolves.toEqual([]);
 
       await expect(createForumPost({ title: '', content: 'x' }, user.id)).rejects.toMatchObject({ status: 400 });
-      
+
       const post = await createForumPost({ title: 'T', content: 'C' }, user.id);
       expect(post).toMatchObject({ title: 'T', content: 'C' });
 
       await expect(createComment({ id: 'abc', content: 'hi' }, user.id)).rejects.toMatchObject({ status: 400 });
-      
+
       const comment = await createComment({ id: String(post.id), content: 'hi' }, user.id);
       expect(comment).toMatchObject({ content: 'hi' });
 
       await expect(getSpecificComments({ id: '' }, user.id)).rejects.toMatchObject({ status: 400 });
       await expect(getSpecificComments({ id: 'x' }, user.id)).rejects.toMatchObject({ status: 400 });
-      
+
       const comments = await getSpecificComments({ id: String(post.id) }, user.id);
       expect(comments).toHaveLength(1);
 
       // Save push subscription validations
       await expect(savePushSubscription({ endpoint: 'https://example.com', keys: { p256dh: 'a', auth: 'b' } }, undefined)).rejects.toMatchObject({ status: 401 });
       await expect(savePushSubscription({ endpoint: '', keys: { p256dh: 'a', auth: 'b' } }, user.id)).rejects.toMatchObject({ status: 400 });
-      
+
       const sub1 = await savePushSubscription({ endpoint: 'https://example.com', keys: { p256dh: 'a', auth: 'b' } }, user.id);
       expect(sub1).toMatchObject({ endpoint: 'https://example.com' });
-      
+
       // Update subscription
       const sub2 = await savePushSubscription({ endpoint: 'https://example.com', keys: { p256dh: 'a', auth: 'b' } }, user.id);
       expect(sub2.id).toBe(sub1.id);
@@ -303,11 +303,11 @@ describe('branch coverage suite', () => {
       console.log('1.1 register');
       const registerRes = await request(authApp, '/register', { method: 'POST', body: { name: 'Route User', email: 'route@example.com', password: 'StrongP@ss1', role: 'listener' } });
       expect(registerRes.response.status).toBe(201);
-      
+
       console.log('1.2 login');
       const loginRes = await request(authApp, '/login', { method: 'POST', body: { email: 'route@example.com', password: 'StrongP@ss1' } });
       expect(loginRes.response.status).toBe(200);
-      
+
       console.log('1.3 logout');
       const logoutRes = await request(authApp, '/logout', { method: 'POST' });
       expect(logoutRes.response.status).toBe(200);
@@ -315,7 +315,7 @@ describe('branch coverage suite', () => {
       // Fetch user from DB for profile request
       const routeUserObj = await prisma.user.findUnique({ where: { email: 'route@example.com' } });
       const userToken = jwt.sign({ userId: routeUserObj.id }, process.env.JWT_SECRET);
-      
+
       console.log('1.4 me');
       const meRes = await request(authApp, '/me', { method: 'GET', cookie: `token=${userToken}` });
       expect(meRes.response.status).toBe(200);
@@ -334,7 +334,7 @@ describe('branch coverage suite', () => {
       const listener = await prisma.user.create({ data: { name: 'List R', email: 'list_route@example.com', password: 'h', role: 'listener' } });
       const imamToken = jwt.sign({ userId: imam.id }, process.env.JWT_SECRET);
       const listenerToken = jwt.sign({ userId: listener.id }, process.env.JWT_SECRET);
-      
+
       console.log('2.1 create session');
       const sessionCreateRes = await request(sessionApp, '/', { method: 'POST', body: { title: 'T', description: 'D' }, cookie: `token=${imamToken}` });
       expect(sessionCreateRes.response.status).toBe(201);
@@ -360,7 +360,7 @@ describe('branch coverage suite', () => {
       console.log('3.1 create user');
       const userCreateRes = await request(usersApp, '/', { method: 'POST', body: { name: 'New U', role: 'listener' }, cookie: `token=${imamToken}` });
       expect(userCreateRes.response.status).toBe(201);
-      
+
       console.log('3.2 list users');
       const userListRes = await request(usersApp, '/', { method: 'GET', cookie: `token=${imamToken}` });
       expect(userListRes.response.status).toBe(200);

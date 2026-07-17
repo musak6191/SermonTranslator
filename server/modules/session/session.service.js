@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const webpush = require('web-push');
+import webpush from 'web-push';
 const prisma = new PrismaClient();
 
 const createSession = async (data, userId) => {
@@ -201,6 +201,8 @@ const endSession = async (data, userId) => {
               await prisma.pushSubscription.delete({ where: { endpoint: sub.endpoint } });
             } else {
               console.error('Error sending push notification:', err);
+              console.error('statusCode:', err.statusCode);
+              console.error('keys:', Object.keys(err));
             }
           })
         );

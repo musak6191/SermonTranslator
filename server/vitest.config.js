@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
+    setupFiles: ['./tests/setup.js'],
     include: ['tests/**/*.test.{js,ts}'],
     maxWorkers: 1,
     minWorkers: 1,
