@@ -26,7 +26,9 @@ This application uses the browser's Web Speech API, which requires microphone ac
 
 Die meisten Prompt Iterationen waren Bug fixes, basierend auf dem ersten Prompt. Zudem wurden auch nicht jede Prompts dokumentiert, da ich mir das nicht recht angewöhnt habe.
 
-CODE COVERAGE FROM 04_07_26:
+Diese Read.me fungiert ebenfalls als Documentation.md
+
+## CODE COVERAGE FROM 04_07_26:
 
 All files
 67.22% Statements 519/772
@@ -38,9 +40,19 @@ to test again run npm run test:coverage
 
 # Session 1: Full-Stack Setup
 
+## Thoughts and Infrastructure Choices:
+
+Ich will eine App entwickeln, die zwischen türkischen Predigern und anderssprachigen Zuhörern Übersetzungen vermittelt.
+
+## Prompts:
+
 Init Prompt: "Ich will als Prediger, dass meine Predigen auf Zielsprachen übersetzt werden in Echtzeit."
 
 # Session 2: Frontend-Architektur
+
+## Thoughts and Infrastructure Choices:
+
+Ich brauche für die Zuhörerview Client-side Rendering, damit der Userflow flüssig bleibt, wenn man die End-Sprache ändern möchte. Als Server Sided Rendering habe ich die damalige Startseite genommen, damit sie sofort alles ladet.
 
 ## Prompts:
 
@@ -53,6 +65,12 @@ Init Prompt: "Ich will als Prediger, dass meine Predigen auf Zielsprachen übers
 Klar CSR, da Websockets für meine Anwendung wichtig sind und diese besser mit CSR funktionieren. Die SEO ist hierbei zweitrangig, da es sich ohnehin bereits um ein nischiges Produkt handelt, welches somit besser konkurriert.
 
 # Session 3: API Design
+
+## Thoughts and Infrastructure Choices:
+
+Im Grunde genommen habe ich als die wichtigsten API-Endpunkte die Sessions, Translations und Users. Die Users, die auf die Session zugreifen können, bekommen demenstsprechend die nötige Übersetzungen geliefert. Weitere wichtige API-Endpunkte sind dann noch selber hinzugekommen auch viel mithilfe der KI.
+
+Ungefähr hier habe ich begonnen eigene Figma-Designs für die App zu erstellen und dann zu implementieren. Die Namensgebung fiel von "Sermon Translator" auf "Zermon", was besser in den Kopf geht und mehr Charakter ausstrahlt und ich entschied mich für einen minzgrünen Look, abgeleitet von der Farbe dunkel-grün, die oft für Koran Bände verwendet wurde. Die Überschriften lesen in einer Serifen Schrift ("EB Garamond") und die Texte in einer modernen sans-serif Schrift ("Public Sans"). Beim Layout achtete ich auf wenig Ablenkung und somit clean & minimalistisch.
 
 ## Prompts:
 
@@ -79,6 +97,14 @@ Strukturentscheidung: "Flaches Design mit Query-Parametern", da meine App wenige
 
 # Session 4: Datenhaltung & Persistenz
 
+## Thoughts and Infrastructure Choices:
+
+Nun, da die API steht ging es an die Datenschematas. Die sind sehr ähnlich aufgebaut, nur dass ich mich hier noch entschieden habe, eine Forum-Funktion mitreinzunehmen, um User länger auf der Website zu halten und mehr raus zu holen. Uns wurde empfohlen Prisma für die Datenhaltung zu benutzen und in der Entwicklung als auch im Produktiv-Betrieb benutze ich SQLite.
+
+SQLite benutze ich im Produktiv-Betrieb, da eine mysql Migration viele Probleme bereitet hat.
+
+Welche Daten wo gespeichert werden wurde zu einer wechselhaften Aufgabe, besonders da sich die App und ihr Scope über die Zeit geändert haben: Am Anfang entwickelte ich eine App, die eigentlich nur lokale Zuhörer einbinden sollte und mit dem Fortschritt habe ich den Scope überarbeitet zu einer Plattform für Gläubige. Dementsprechend konnte ich die Übersetzungen nicht mehr im Cache lagern, sondern speichere sie in einer Datenbank, welche einsehbar ist, falls man eine Predigt verpasst hat. 
+
 ## Prompts
 
 „Ich habe ein Express-Backend auf Port 3001. Richte Prisma als ORM ein. Nutze als Datenbank SQLite mit dem Paket better-sqlite3. Mein Datenmodell:'users(id, name, email, password, role)
@@ -104,6 +130,10 @@ push_subscriptions(id, userId, endpoint, p256dh, auth, createdAt)
 In der Datenbank müssten Userinformationen liegen, da sich diese für eine Datenbank gut eignen. Da meine App viel auf Echtzeit-Traffic basiert, kann man diese Daten auch auf dem Cache speichern, obwohl ich auch überlege, Predigen zu speichern, diese müssten dann ebenfalls in einer Datenbank angelegt sein.
 
 # Session 5: Security
+
+## Thoughts and Infrastructure Choices:
+
+Meine App fehlte jegliche Art von Security, diese Session sollte mir dabei helfen dem entgegenzuwirken. Hierbei implementierte ich einen E-Mail Login und Register Screen und eine JWT-Middleware. Ein Login und Register Abfrage war nicht vorgesehen, aber wie gesagt, der Scope änderte sich.
 
 ## Prompts:
 
@@ -142,6 +172,10 @@ Die App hat noch Broken Access Control issues hinsichtlich fehlender Authentifiz
 
 # Session 6: Testing
 
+## Thoughts and Infrastructure Choices:
+
+Der wohl nervenaufreibenste Part, hier gingen womöglich die meisten Tokens futsch. Ich wusste zuvor nicht, dass man seine Software automatisch testen lassen kann. Für die Unit- und Integration-Tests benutze ich Vitest und für die E2E-Tests benutze ich Cypress.
+
 ## Prompts:
 
 „Schreibe Vitest Unit Tests für Login-inputs. Decke folgende Fälle ab: Normalfall, leerer Input, ungültiger Typ."
@@ -160,6 +194,11 @@ Flow,        /participate
       -Session erstellen und dass man Sessions beitreten kann.
 
 # Session 7: Real-time Web
+
+## Thoughts and Infrastructure Choices:
+
+Das ist der spannenste Art meiner Entwicklung, da hier die Hauptfunktion der Anwendunge zustande kam, nämlich das "Real-time" in "Real-time Übersetzungen". Hierfür benutze ich Websockets, die eine Verbindung zwischen den zwei Clients herstellt (Iman und Zuhörer) und sofort die Daten zum Zuhörer weiterleitet.
+Es wurden hier ebenfalls noch Designentscheidungen getroffen wie das Polling für das Laden der Session und Forumposts in der jeweiligen Overview. 
 
 ## Prompts: 
 
@@ -210,6 +249,10 @@ Diese Changes setzte ich um.
 
 # Session 8: Async Messaging
 
+## Thoughts and Infrastructure Choices:
+
+Für das Async Messaging benutze ich Web Push, wenn eine Session beendet wird, um die Zuhörer zu benachrichtigen. Und E-Mail Benachrichtigungen für Password-Link-Resets, somit ist das sicherer. Hierbei war es recht interessant zu erörtern, inwiefern Async Messaging sinnvoll ist für meine Art der Anwendung.
+
 ## Prompts:
 
 „Implementiere E-Mail-Benachrichtigungen für Password Resets. Stack: Express-Backend, Resend als Mail-API, React Email für das Template. Anforderungen: Das Passwort soll einen Link zu einer Passwort Reset Page enthalten. Der Mailversand darf den HTTP-Request nicht blockieren. Fehlerbehandlung mit try/catch. Der API-Key kommt aus der .env-Datei."
@@ -253,9 +296,13 @@ Für das Ende einer Session, ist bereits eine Push-Benachrichtigung eingesetzt. 
 
 # Session 9: Monolithen vs. Microservices
 
+## Thoughts and Infrastructure Choices:
+
+Hierbei nutze ich natürlichen einen Monolithen. An der Stelle habe ich auch den Backend-Code refaktoriert, basierend auf den Funktionen.
+
 ## Prompts:
 
-„Refactore meinen POST /api/session-Handler (Alle Handler durch iterieren). Die Validierung und die Prisma-Abfrage sollen in eine neue Datei habits/habits.service.js als Funktion createHabit(data, userId) ausgelagert werden. Der Route-Handler bleibt schlank: Input aus req.body nehmen, createHabit aufrufen, Ergebnis zurückgeben. Fehlerbehandlung mit try/catch und passenden HTTP-Status-Codes."
+„Refactore meinen POST /api/session-Handler (Alle Handler durch iterieren). Die Validierung und die Prisma-Abfrage sollen in eine neue Datei auth/auth.service.js als Funktion createLogin(data, userId) ausgelagert werden. Der Route-Handler bleibt schlank: Input aus req.body nehmen, createLogin aufrufen, Ergebnis zurückgeben. Fehlerbehandlung mit try/catch und passenden HTTP-Status-Codes."
 
 „Restrukturiere mein Express-Backend nach diesem Muster: Jeder Bounded Context (Session, Auth, Translation) bekommt einen eigenen Ordner unter modules/. Darin liegen: [kontext].routes.js, [kontext].service.js. In server.js werden die Routen mit app.use('/api/translation', translationRouter) eingebunden. Bestehende Logik aus routes/ soll in die neue Struktur überführt werden, ohne Funktionalität zu ändern."
 
@@ -331,6 +378,10 @@ sendPasswordResetEmail() should be put into its own email service. Socket.io is 
 
 # Session 10: Deployment
 
+## Thoughts and Infrastructure Choices:
+
+Das Deployement lief auf dem uns kostenlos zur Verfügung gestellten HetznerH Servern. Hierbei wollten wir vorerst, das Front- und Backend auf zwei verschiedenen Domains laufen lassen, die dann miteinander kommunizieren sollen (api.zermon.de & zermon.de), allerdings erwies sich das als technisches Problem im Rahmen vom Hetzner Anbieter, somit deployen wir die Anwendungen als eine Node-App auf Zermon.de. Dafür sollte der KI-Agent Code Anpassungen vornehmen, wir haben die Daten auf den Server geladen, die Laufzeitvariablen eingestellt und den Server online genommen. Hierbei gab es hauptsächlich Probleme mit den Laufzeitvariablen, diese sind aber weitesgehend gefixxt.
+
 ## Prompts:
 
 „Mein Frontend ruft das Backend bisher über http://localhost:5173 auf. Ich deploye jetzt Frontend und Backend als eine Node.js-App auf derselben Domain, die API hängt unter dem Pfad /api. Stelle authFetch() und alle anderen API-Aufrufe auf relative Pfade um (z. B. /api/login statt http://localhost:3001/login). Richte außerdem in vite.config.js einen Dev-Proxy ein, der im Dev alle /api-Anfragen an http://localhost:3001 weiterleitet, damit dieselben relativen Pfade lokal und in Produktion funktionieren."
@@ -349,6 +400,10 @@ Backend (Express) Node.js-App       zermon.de/api	            konsoleH Node.js
 Datenbank (SQL) 	MySQL/MariaDB 	zermonDB (auf dem Server) 	konsoleH DB-Verwaltung
 
 # Session 11: Polish
+
+## Thoughts and Infrastructure Choices:
+
+Hierfür gab es einen letzten Security Check, mittels Code Sniper, den uns unser Professor vermittelt und betreute. Ich habe die Critical und High Severity Issues gefixxt (Ungefähr 5-7 in der Anzahl) und machte mich an die letzte Task eine Landing Page zu entwerfen und zu implementieren. Bei dem Design achtete ich besonders auf einen minimalistischen, cleanen Look, der ebenfalls "Heiligkeit" ausstrahlen soll. Der CTA ist für das Registrieren auf der Seite.
 
 ## Prompts:
 
@@ -409,3 +464,8 @@ FIX 2: Complete Lack of Authentication and Authorization on Socket.io Event Hand
 
 FIX 3: Insecure Direct Object Reference (IDOR) in Session Retrieval Endpoint
 - Unauthorized users could still participate in sessions. There was no Authorization check to verify if the user was the imam or a registered participant.
+
+# Fazit
+
+Alles in allem, war es eine tolle Erfahrung, selber Hand angelegt zu haben in einem Web-Entwicklungsprozess. Hierbei lernte ich viel über die Architektur Konzepte und Prinzipien und freu mich ehrlich gesagt, sie in weiteren Projekten zu verinnerlichen.
+Man wurde sehr großzügig vom Professor abgeholt, was heißt, sobald man in den Vorlesungen aufgepasst hat und den Inhalt verstanden hat, fühlte man sich dementsprechend auch selbstsicherer in der Ausübung und in Diskussionen.
