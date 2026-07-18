@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client';
 import webpush from 'web-push';
 const prisma = new PrismaClient();
 
@@ -230,7 +230,7 @@ const getAllSession = async (data, userId) => {
   return sessions;
 };
 
-module.exports = {
+export {
   createSession,
   getSession,
   joinSession,

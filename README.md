@@ -31,10 +31,10 @@ Diese Read.me fungiert ebenfalls als Documentation.md
 ## CODE COVERAGE FROM 04_07_26:
 
 All files
-67.22% Statements 519/772
-51.53% Branches 151/293
-58.49% Functions 31/53
-67.89% Lines 516/760
+78.85% Statements
+65.87% Branches
+71.69% Functions
+79.44% Lines
 
 to test again run npm run test:coverage
 
