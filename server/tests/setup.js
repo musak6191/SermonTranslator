@@ -1,5 +1,7 @@
 import { vi } from 'vitest';
 
+process.env.RESEND_API_KEY = process.env.RESEND_API_KEY || 're_test_dummy_key'; // For unittesting
+
 vi.mock('web-push', () => {
     const sendNotification = vi.fn((subscription) => {
         console.log('MOCK PUSH:', subscription.endpoint);
