@@ -103,4 +103,26 @@ describe('session service', () => {
     const deleted = await prisma.session.findUnique({ where: { id: session.id } });
     expect(deleted).toBeNull();
   });
+
+  it('rejects ending a session with an invalid session ID', async () => {
+    const imam = await prisma.user.create({
+      data: { name: 'Imam', email: 'imam6@example.com', password: 'hashed-password', role: 'imam' }
+    });
+
+    await expect(endSession({ id: 'abc' }, imam.id)).rejects.toMatchObject({
+      status: 400,
+      payload: { error: 'Invalid session ID' }
+    });
+  });
+
+  it('rejects ending a session if the session does not exist', async () => {
+    const imam = await prisma.user.create({
+      data: { name: 'Imam', email: 'imam7@example.com', password: 'hashed-password', role: 'imam' }
+    });
+
+    await expect(endSession({ id: '999999' }, imam.id)).rejects.toMatchObject({
+      status: 404,
+      payload: { error: 'Session not found' }
+    });
+  });
 });

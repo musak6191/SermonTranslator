@@ -166,4 +166,58 @@ describe('auth service', () => {
     const updatedUser = await prisma.user.findUnique({ where: { id: user.id } });
     expect(await bcrypt.compare('StrongP@ss1', updatedUser.password)).toBe(true);
   });
+
+  it('rejects password reset if token or newPassword is missing', async () => {
+    await expect(resetPasswordWithToken({ token: '', newPassword: 'StrongP@ss1' }, null)).rejects.toMatchObject({
+      status: 400,
+      payload: { error: 'Token and new password are required' }
+    });
+
+    await expect(resetPasswordWithToken({ token: 'token', newPassword: '' }, null)).rejects.toMatchObject({
+      status: 400,
+      payload: { error: 'Token and new password are required' }
+    });
+  });
+
+  it('rejects password reset if the token is malformed / undecodable', async () => {
+    await expect(resetPasswordWithToken({ token: 'not-a-valid-token', newPassword: 'StrongP@ss1' }, null)).rejects.toMatchObject({
+      status: 400,
+      payload: { error: 'Invalid token' }
+    });
+  });
+
+  it('rejects password reset if the token user does not exist', async () => {
+    const nonExistentUserToken = jwt.sign({ userId: 999999 }, 'test-secret');
+    await expect(resetPasswordWithToken({ token: nonExistentUserToken, newPassword: 'StrongP@ss1' }, null)).rejects.toMatchObject({
+      status: 404,
+      payload: { error: 'User not found' }
+    });
+  });
+
+  it('rejects password reset if the token signature is invalid', async () => {
+    const user = await prisma.user.create({
+      data: { name: 'User', email: 'user-sig@example.com', password: 'old-hash', role: 'listener' }
+    });
+    // Sign with wrong secret
+    const badSecret = 'wrong-secret';
+    const badToken = jwt.sign({ userId: user.id }, badSecret, { expiresIn: '15m' });
+
+    await expect(resetPasswordWithToken({ token: badToken, newPassword: 'StrongP@ss1' }, null)).rejects.toMatchObject({
+      status: 400,
+      payload: { error: 'Invalid or expired token' }
+    });
+  });
+
+  it('rejects password reset if the new password is weak', async () => {
+    const user = await prisma.user.create({
+      data: { name: 'User', email: 'weak-p@example.com', password: 'old-hash', role: 'listener' }
+    });
+    const secret = process.env.JWT_SECRET + user.password;
+    const token = jwt.sign({ userId: user.id }, secret, { expiresIn: '15m' });
+
+    await expect(resetPasswordWithToken({ token, newPassword: 'weak' }, null)).rejects.toMatchObject({
+      status: 400,
+      payload: { error: expect.stringContaining('Password must be') }
+    });
+  });
 });
