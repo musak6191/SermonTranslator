@@ -9,6 +9,8 @@ import { authFetch } from './utils/auth'
 export default function Page() {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const lastCtaSectionClass =
+    'relative left-1/2 right-1/2 w-screen -ml-[50vw] -mr-[50vw] rounded-none !bg-brandDark px-4 py-14 min-h-[25vw] shadow-[0_24px_80px_rgba(17,45,22,0.08)] sm:px-6 lg:px-8'
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -49,8 +51,7 @@ export default function Page() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#eef7ec] px-4 py-10 sm:px-6 lg:px-8">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-full bg-[radial-gradient(circle_at_top,_rgba(24,191,35,0.18),_transparent_50%)]" />
+      <main className="relative min-h-screen overflow-hidden bg-[#eef7ec] px-4 pt-6 sm:px-6 sm:pt-14 lg:px-8 lg:pt-20">      <div className="pointer-events-none absolute inset-x-0 top-0 h-full bg-[radial-gradient(circle_at_top,_rgba(24,191,35,0.18),_transparent_50%)]" />
       <div className="pointer-events-none absolute -right-20 -top-10 h-[30rem] w-[30rem] rounded-full bg-[#d9f5dd]/60 blur-[120px]" />
 
       <div className="mx-auto flex max-w-7xl flex-col gap-20">
@@ -79,8 +80,8 @@ export default function Page() {
             </div>
           </div>
 
-          <Card className="overflow-hidden bg-surface">
-            <div className="rounded-[1.75rem] border border-[#dbeade] bg-white/95 p-8 shadow-[0_24px_80px_rgba(17,45,22,0.08)]">
+          <Card className="overflow-hidden !bg-[#f6fbf7]">
+            <div className="rounded-[1.75rem] border border-[#dbeade] bg-[#f6fbf7]/95 p-8 shadow-[0_24px_80px_rgba(17,45,22,0.08)]">
               <span className="inline-flex items-center rounded-full bg-[#eef7ec] px-3 py-1 text-xs font-semibold uppercase tracking-[0.32em] text-brandDark/80">
                 LIVE FROM ISTANBUL
               </span>
@@ -103,7 +104,7 @@ export default function Page() {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-2">
-          <Card className="space-y-5">
+          <Card className="space-y-5 !bg-[#edf6ef] border border-[#dbeade]">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eef7ec] text-brandDark">
               <span className="text-xl">🕌</span>
             </div>
@@ -115,8 +116,8 @@ export default function Page() {
             </div>
           </Card>
 
-          <Card className="space-y-5">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eef7ec] text-brandDark">
+          <Card className="space-y-5 !bg-[#f4f8f5] border border-[#d9f5dd]">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#e6f2ea] text-brandDark">
               <span className="text-xl">🎧</span>
             </div>
             <div className="space-y-3">
@@ -137,13 +138,13 @@ export default function Page() {
           </div>
 
           <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
-            <Card className="space-y-6 bg-brandDark border border-[#dbeade]">
+            <Card className="space-y-6 !bg-[#eef7ec] border border-[#dbeade]">
               <h3 className="font-serif text-3xl font-bold text-brandDark">Real-Time AI Translation</h3>
               <p className="text-textMuted leading-8">
                 Proprietary AI models trained on religious texts ensure theological accuracy and cultural sensitivity in every sentence.
               </p>
             </Card>
-            <Card className="space-y-4 bg-backgroundSoft/90 border border-backgroundSoft">
+            <Card className="space-y-4 !bg-[#f7fbf6] border border-[#c9e7d8]">
               <h3 className="font-serif text-3xl font-bold text-brandDark">Sacred Minimalism</h3>
               <p className="text-textMuted leading-7">
                 A distraction-free UI designed to let you focus solely on the message and your spiritual growth.
@@ -152,13 +153,13 @@ export default function Page() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="space-y-4 bg-[#eef7ec] border border-[#dbeade]">
+            <Card className="space-y-4 !bg-[#edf6ef] border border-[#d9f5dd]">
               <h4 className="font-serif text-2xl font-semibold text-brandDark">Past Sermon Archive</h4>
               <p className="text-textMuted leading-7">
                 Access a library of translated sermons. Revisit teachings anytime, anywhere, with saved notes and bookmarks.
               </p>
             </Card>
-            <Card className="space-y-4 bg-border border border-[#d9f5dd]">
+            <Card className="space-y-4 !bg-[#f4f8f5] border border-[#cfe6d5]">
               <h4 className="font-serif text-2xl font-semibold text-brandDark">Community Discussion</h4>
               <p className="text-textMuted leading-7">
                 Connect with others globally. Discuss sermons, share insights, and build a borderless spiritual community.
@@ -167,20 +168,20 @@ export default function Page() {
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-[#dbeade] bg-brandDark p-14 shadow-[0_24px_80px_rgba(17,45,22,0.08)]">
-          <div className="flex flex-col items-center justify-between gap-6 text-center lg:flex-row lg:text-left">
+        <section className={lastCtaSectionClass}>
+          <div className="mx-auto flex max-w-7xl flex-col gap-6 text-center text-white lg:flex-row lg:items-center lg:justify-center lg:text-left">
             <div className="max-w-2xl">
-              <h2 className="font-serif text-3xl font-bold text-backgroundSoft sm:text-4xl">
+              <h2 className="font-serif text-5xl font-bold text-backgroundSoft sm:text-6xl">
                 Join the Zermon community today.
               </h2>
-              <p className="mt-4 text-textMuted leading-8">
+              <p className="mt-4 leading-8 text-backgroundSoft/80">
                 Start your journey towards a deeper, more inclusive spiritual experience. No credit card required.
               </p>
             </div>
             <Button
               onClick={() => router.push('/register')}
               variant="secondary"
-              className="w-full max-w-sm sm:w-auto bg-white text-brandDark hover:bg-slate-100"
+              className="!w-full !max-w-none !bg-backgroundSoft !text-text hover:!bg-white/40 lg:!w-80"
             >
               Be part of it
             </Button>
