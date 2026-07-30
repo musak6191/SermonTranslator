@@ -28,13 +28,13 @@ Die meisten Prompt Iterationen waren Bug fixes, basierend auf dem ersten Prompt.
 
 Diese Read.me fungiert ebenfalls als Documentation.md
 
-## CODE COVERAGE FROM 04_07_26:
+## CODE COVERAGE FROM 30_07_26:
 
 All files
-78.85% Statements
-65.87% Branches
-71.69% Functions
-79.44% Lines
+Statements: 87.67%
+Branches: 73.72%
+Functions: 92.45%
+Lines: 87.61%
 
 to test again run npm run test:coverage
 
